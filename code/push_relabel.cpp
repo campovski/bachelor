@@ -206,7 +206,7 @@ int get_overflowing_vertex()
 }
 
 // Updates flow on reverse edge. If the edge does not exist,
-// create and edge in residual flow.
+// create an edge in residual flow.
 void update_reverse_edge(int i, int delta)
 {
     for (int j = 0; j < edges.size(); j++)
