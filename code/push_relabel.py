@@ -32,7 +32,8 @@ class Graph:
 			if self.edges[i].u == 0:
 				self.edges[i].f = self.edges[i].c
 				self.vertices[self.edges[i].v].e = self.edges[i].f
-				self.add_edge(self.edges[i].v, 0, 0, -self.edges[i].f)
+				#self.add_edge(self.edges[i].v, 0, 0, -self.edges[i].f)
+				self.update_reverse_edge(i, self.edges[i].f)
 	
 	def push(self, u):
 		for i in range(len(self.edges)):
@@ -68,7 +69,7 @@ class Graph:
 			if self.edges[i].u == self.edges[j].v and self.edges[i].v == self.edges[j].u:
 				self.edges[j].f -= delta
 				return
-		self.add_edge(self.edges[i].v, self.edges[i].u, delta, 0)
+		self.add_edge(self.edges[i].v, self.edges[i].u, 0, -delta)
 		
 	def add_edge(self, u, v, c, f):
 		self.edges.append(self.Edge(u, v, c, f))

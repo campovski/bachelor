@@ -139,7 +139,7 @@ int push(int u)
     for (int i = 0; i < edges.size(); i++)
     {
         // Assert that requirements are fulfilled.
-        if (edges[i].u == u && edges[i].f < edges[i].c && vertices[u].h > vertices[edges[i].v].h)
+        if (edges[i].u == u && edges[i].f < edges[i].c && vertices[u].h == vertices[edges[i].v].h +1)
         {
             // We can only push the minimum of excess in u and the
             // remaining capacity of edge between u and adjacent.
@@ -221,7 +221,7 @@ void update_reverse_edge(int i, int delta)
     }
     
     // Add edge in residual graph with capacity of flow we pushed.
-    edges.push_back(Edge(edges[i].v, edges[i].u, delta, 0));
+    edges.push_back(Edge(edges[i].v, edges[i].u, 0, -delta));
 }
 
 

@@ -1,6 +1,12 @@
 bin/
 *~
 
+# LaTeX files
+*.aux
+*.log
+*.out
+*.toc
+
 # Compiled Object files
 *.slo
 *.lo

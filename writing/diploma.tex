@@ -1,0 +1,667 @@
+\documentclass[mat1]{fmfdelo}
+% \documentclass[fin1]{fmfdelo}
+% \documentclass[isrm1]{fmfdelo}
+% \documentclass[mat2]{fmfdelo}
+% \documentclass[fin2]{fmfdelo}
+% \documentclass[isrm2]{fmfdelo}
+
+% aktivirajte pakete, ki jih potrebujete
+% \usepackage{tikz}
+
+% za številske množice uporabite naslednje simbole
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\C}{\mathbb C}
+\newcommand{\Q}{\mathbb Q}
+
+% matematične operatorje deklarirajte kot take, da jih bo Latex pravilno stavil
+% \DeclareMathOperator{\conv}{conv}
+
+% na razpolago so naslednja matematična okolja, ki jih kličemo s parom 
+% \begin{imeokolja}[morebitni komentar v oklepaju] ... \end{imeokolja}
+%
+% definicija, opomba, primer, zgled, lema, trditev, izrek, posledica, dokaz
+% 
+
+
+% vstavite svoje definicije ...
+%  \newcommand{}{}
+
+
+% naslednje ukaze ustrezno napolnite
+\avtor{Marcel Čampa} 
+
+\naslov{Algoritem potisni-povišaj za iskanje maksimalnih pretokov}
+\title{Push-relabel algorithm for maximum flow problem}
+
+% navedite ime mentorja s polnim nazivom: doc.~dr.~Ime Priimek, 
+% izr.~prof.~dr.~Ime Priimek, prof.~dr.~Ime Priimek
+% uporabite le tisti ukaz/ukaze, ki je/so za vas ustrezni 
+\mentor{prof.~dr.~Sergio Cabello}
+% \mentorica{}
+% \somentor{}
+% \somentorica{}
+% \mentorja{}{}
+% \mentorici{}{}
+
+\letnica{2017} % leto diplome
+
+%  V povzetku na kratko opišite vsebinske rezultate dela. Sem ne sodi razlaga organizacije dela --
+%  v katerem poglavju/razdelku je kaj, pač pa le opis vsebine.
+\povzetek{}
+
+%  Prevod slovenskega povzetka v angleščino. 
+\abstract{}
+
+% navedite vsaj eno klasifikacijsko oznako --
+% dostopne so na www.ams.org/mathscinet/msc/msc2010.html
+\klasifikacija{}
+\kljucnebesede{} % navedite nekaj ključnih pojmov, ki nastopajo v delu
+\keywords{} % angleški prevod ključnih besed
+
+
+\begin{document}
+
+\section{Uvod}
+
+\section{Iskanje maksimalnega pretoka z algoritmom potisni-povišaj}
+
+V tem razdelku si bomo podrobneje ogledali algoritem \textit{potisni-povišaj}. Začeli bomo s kratkim opisom delovanja algoritma in intuitivno razložili, kako algoritem deluje. Nato si bomo pogledali psevdokodo algoritma in se z njo pobližje spoznali na zgledu. Sledili bosta implementaciji algoritma v programskem jeziku Python in C++. Pokazali bomo pravilnost delovanja algoritma in njunih implementacij ter časovno zahtevnost algoritma. Na koncu razdelka pa si bomo vzeli še trenutek za primerjavo časov izvajanja obeh implementacij.
+
+\subsection{O algoritmu}
+Algoritem potisni-povišaj deluje po preprostem principu iz narave. Predsavljajmo si, da imamo rečno omrežje, ki se začne v eni točki in konča v eni točki. Z drugimi besedami imamo eno reko, ki pa se vmes poljubno deli in združuje. Seveda je na zemlji prisotna gravitacijska sila, ki povzroči, da voda teče od višje točke proti nižji, recimo od izvira v hribih do ponora v morje, vmes pa ubira tako pot, da nikjer ne gre navzgor. V jeziku grafov lahko predstavimo omenjeni pojav na naslednji način. Tam, kjer se reka deli oziroma združi, postavimo vozlišče grafa. Del reke med dvema razvejiščema predstavlja povezavo med razvejiščema pripadajočima vozliščema. Izvir in ponor reke pa predstavljata vozlišči $s$ in $t$. Vsakemu vozlišču pripišemo višino, na kateri se nahaja, in količino vode, ki je vanj pritekla in odtekla. Seveda se v naravi ne zgodi (razen v primeru neurij), da bi v razvejišče priteklo več vode, kot pa je je iz njega odteklo. Prav tako ne more priteči manj vode, kot je odteče.
+
+Sedaj, ko smo se spomnili, kako deluje mati narava, in to prevedli v matematični jezik, si podrobneje poglejmo, kako deluje algoritem potisni-povišaj. Začnemo z omrežjem (od sedaj naprej bomo rajši kot o grafih govorili o omrežjih) $G = (V, E, s, t)$ in funkcijama $c\colon V \times V \rightarrow \N$, ki vsaki povezavi priredi njeno kapaciteto, in $f\colon V \times V \rightarrow \N$, ki za vsako povezavo pove, koliko vode teče v nekem trenutku preko nje. Vozliščem $v \in V$ priredimo še funkciji $h\colon V \rightarrow \N_0$, ki določa višino vozlišča, in $e\colon V \rightarrow \N_0$, ki pove, koliko preveč vode je priteklo v neko vozlišče. Seveda velja \[e(u) = \sum_{v \in V} f(v,u) - \sum_{v \in V} f(u,v).\] Algoritem na začetku nastavi višino vseh vozlišč razen vozlišča $s$ na nič in višino $s$ na $|V|$. Tako na začetku velja $h(s) = |V|$ in $h(u) = 0$, $u \in V \setminus {s}$. Nato potisnemo iz $s$ tok v sosednja vozlišča tako, da zasičimo povezave, torej da velja $f(s, v) = c(s, v)$, za vse $v \in V$, za katere velja $(s, v) \in E$. Poleg tega dodamo v residualno omrežje še obratne povezave, katerim nastavimo $f(v,s) = -f(s,v)$, da zadostimo pogoju (manjka referenca na definicijo toka). S tem smo ustvarili tako imenovani \textit{predtok}. To smo lahko storili, ker je višina vozlišča $s$ večja kot višina sosednjih vozlišč $v$, saj $h(s) = |V| > 0 = h(v)$.
+
+Rezultat te operacije je, da se je v vozliščih, sosednjih vozlišču $s$, nabrala odvečna voda. Za ta vozlišča torej velja $e(v) > 0$. Sedaj lahko potisnemo vodo iz teh vozlišč naprej, saj je vode v njih preveč, želimo pa, da je odteče toliko, kot je priteče. Vendar tega ne moremo storiti, saj so višine sosednjih vozlišč prav tako enake nič. Zato si izberemo neko vozlišče $u$, v katerega je priteklo preveč vode, in mu povečamo višino na $\min\{h(v) : (u,v) \in E_f\} + 1$. S tem smo omogočili, da bo voda odtekla v vsaj eno izmed vozlišč. Ta postopek ponavljamo, dokler lahko potisnemo tok v omrežju ali pa povišamo neko vozlišče. Tok, ki na koncu priteče v $t$, je enak maksimalnemu pretoku omrežja, kar bomo pokazali kasneje.\\
+
+Oglejmo si sedaj psevdokodo algoritma. Spoznali smo, da je algoritem sestavljen iz dveh osnovnih operacij, \textit{potiskanja} in \textit{povišanja}, zato se posvetimo tema operacijama. Začnimo s potiskanjem.\\
+
+\begin{verbatim}
+POTISNI (u, v)
+1   // Potisnemo lahko, če je e(u) > 0, c(u,v) > 0 in h(u) = h(v) + 1.
+2   delta = min{ e(u), c(u,v) - f(u,v) }
+3   ČE (u,v) v E, POTEM
+4       f(u,v) += delta
+5   DRUGAČE f(v,u) -= delta
+6   e(u) -= delta
+7   e(v) += delta
+\end{verbatim}~
+
+To operacijo lahko storimo, če ima $u$ presežek toka, torej, če velja $e(u) > 0$, če je kapaciteta povezave $c(u,v) > 0$ in če sta vozlišči $u$ in $v$ na primernih višinah, torej če velja $h(u) = h(v) + 1$. Najprej izračunamo, kolikšno količino $\Delta$ lahko potisnemo. Ta je enaka minimumu med presežkom toka v vozlišču $u$ in residualno kapaciteto povezave, ki je enaka $c(u,v) - f(u,v)$. To storimo v vrstici 2. V vrsticah 3--6 potisnemp tok $\Delta$ po povezavi $(u,v)$, če ta povezava obstaja. V nasprotnem primeru potisnemo $-\Delta$ po obratni (residualni) povezavi. V vrsticah 6 in 7 posodobimo še presežek toka v krajiščih povezave. To storimo tako, da v začetnem vozlišču presežek zmanjšamo za tok, ki smo ga potisnili, v končnem vozlišču pa presežek povečamo.
+
+Nadaljujmo z operacijo povišanja vozlišča.\\
+
+\begin{verbatim}
+POVIŠAJ (u)
+1   // Vozlišče u povišamo, če je e(u) > 0 in
+2   // za vsak v iz V, (u,v) v E_f, velja h(u) <= h(v).
+3   h(u) = min{h(v) : (u,v) v E_f} + 1
+\end{verbatim}~
+
+Operacija povišanja vozlišča $u$ je precej enostavna. Storimo jo takrat, ko ima vozlišče $u$ presežek toka, torej velja $e(u) > 0$, a hkrati ne moremo potisniti toka v sosednja vozlišča, saj so vsa na večji ali enaki višini kot $u$.
+
+V opisu algoritma smo navedli še \textit{inicializacijo predtoka}. Zapišimo psevdokodo za to operacijo.\\
+
+\begin{verbatim}
+INICIALIZIRAJ_PREDTOK(G,s)
+ 1   // V grafu G si izberemo vozlišče s in inicializiramo predtok.
+ 2   ZA vsak v v V(G)
+ 3       h(v) = 0
+ 4       e(v) = 0
+ 5   ZA vsak (u,v) v E(G)
+ 6       f(u,v) = 0
+ 7   h(s) = |V|
+ 8   ZA vsak v, za katerega obstaja (s,v) v E(G)
+ 9       f(s,v) = c(s,v)
+10       e(v) = f(s,v)
+\end{verbatim}~
+
+Kot smo dejali, zgornja operacija nastavi višine vozlišč in presežek toka v vozliščih na nič. To storimo v vrsticah 2--6. V vrstici 7 nato nastavimo višino vozlišča $s$ na število vseh vozlišč v omrežju, torej $h(s) = |V|$. V vrsticah 8--10 nato potisnemo tok prek vseh povezav, ki izhajajo iz $s$ in v vrstici 10 popravimo še presežek toka v vozlišču $s$ sosednjih vozliščih. Opazimo, da nismo odšteli presežka toka v vozlišču na začetku povezave, torej v vozlišču $s$. Tega nismo storili, ker je to nepotrebno; predstavljamo si namreč, da je v vozlišču $s$ lahko poljubna količina vode, več kot je potrebujemo, več je lahko dobimo. Kasneje bomo videli, kaj se zgodi, če smo v inicializaciji predtoka poslali preveč vode, kot je omrežje lahko spusti skozi.
+
+Čas je, da navedemo še glavni del algoritma, torej ,,program'', ki uporablja zgoraj navedene operacije. Psevdokoda je na videz precej preprosta.\\
+
+\begin{verbatim}
+POTISNI-POVIŠAJ(G,s)
+1   INICIALIZIRAJ_PREDTOK(G,s)
+2   DOKLER obstaja mogoča operacija POTISNI ali POVIŠAJ
+3       izvedi mogočo operacijo
+\end{verbatim}~
+
+Na videz nedolžna, vendar skriva rahlo prepreko do povsem direktne implementacije. Vprašanje, ki se pojavi, je namreč, kako vedeti, ali lahko potisnemo in preimenujemo. Oglejmo si zgled delovanja algoritma in sproti se nam morda porodi ideja.\\
+
+\subsection{Primer delovanja algoritma}
+
+Vzemimo preprosto omrežje na sedmih vozliščih. Naj velja $G = (V, E, s, t)$, kjer je
+\begin{align*}
+	V &= \{0,1,2,3,4,5,6\},\\
+	E &= \{(0,1), (0,2), (0,3), (1,3), (1,5), (2,4), (3,4), (3,6), (4,6), (5,6)\},\\
+	s &= 0,\\
+	t &= 6.
+\end{align*}
+Kapacitete vozlišč so podane v naslednji tabeli.
+
+\begin{table}[h!]
+\centering
+\caption{Kapacitete povezav omrežja $G$.}
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|}
+\hline
+& $(0,1)$ & $(0,2)$ & $(0,3)$ & $(1,3)$ & $(1,5)$ & $(2,4)$ & $(3,4)$ & $(3,6)$ & $(4,6)$ & $(5,6)$\\ \hline
+$c(u,v)$ & $10$ & $3$ & $7$ & $8$ & $5$ & $4$ & $3$ & $12$ & $2$ & $4$\\
+\hline
+\end{tabular}
+\end{table}~
+
+Omrežje $G$ na začetku izgleda takole:
+
+% slika
+
+Poiščimo sedaj maksimalni pretok skozi to omrežje s pomočjo zgoraj opisanega algoritma potisni-povišaj.\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Implementacija algoritma v programskem jeziku Python in C++}
+
+Najprej si oglejmo idejo implementacije v Pythonu. Ker iščemo maksimalni pretok v grafu, si definiramo razred \texttt{Graf}, ki vsebuje dva podrazreda, to sta podrazred \texttt{Vozlisce} in podrazred \texttt{Povezava}, ki predstavljata očitno.
+
+Za vsako vozlišče $u \in V$ si moramo zapomniti njegovo višino $h(u)$ in presežek toka v vozlišču $e(u)$, zato podrazred \texttt{Vozlisce} vsebuje dve vrednosti, \texttt{Vozlisce.h}, ki predstavlja višino vozlišča, in \texttt{Vozlisce.e}, ki predstavlja presežek toka.
+
+Podobno si moramo za vsako povezavo $(u,v) \in E$ zapomniti, kje se začne, torej $u$, in kje konča, torej $v$, ter njeno kapaciteto $c(u,v)$ in trenuten tok čeznjo $f(u,v)$. Tako podrazred \texttt{Povezava} vsebuje štiri vrednosti: \texttt{Povezava.u} in \texttt{Povezava.v} vsebujeta začetno in končno vozlišče povezave, \texttt{Povezava.c} vsebuje podatek o kapaciteti povezave in \texttt{Povezava.f} trenuten tok preko povezave.
+
+Ker graf sestoji iz vozlišč in povezav, vsebuje razred \texttt{Graf} dva seznama -- to sta \texttt{Graf.vozlisca} in \texttt{Graf.povezave} --. V razredu \texttt{Graf} nato definiramo metode, ki nam izračunajo maksimalni pretok skozi graf. Navedimo za začetek le kratke opise metod, podrobnejše si bomo pogledali pri implementaciji v C++, saj bo tam vse skupaj lažje berljivo.
+
+\begin{itemize}
+\item \texttt{maksimalni\_pretok()}: Izračuna maksimalni pretok v grafu.
+\item \texttt{inicializiraj\_predtok()}: Inicializira predtok.
+\item \texttt{potisni(u)}: Poskusi opraviti operacijo potiska iz vozlišča $u$ in nas obvesti, ali ji je uspelo ali ne.
+\item \texttt{povisaj(u)}: Poveča višino vozlišča $u$.
+\item \texttt{vozlisce\_s\_presezkom()}: Poišče vozlišče, v katerem je presežek toka.
+\item \texttt{posodobi\_obratno\_povezavo(i, delta)}: Od obratne povezave odšteje tok, ki smo go ravno poslali. Če povezave ne najde, jo doda v residualnem grafu.
+\item \texttt{dodaj\_povezavo(u,v,c,f)}: V graf doda povezavo $(u,v)$ in pripadojočo kapaciteto $c$ ter tok čez povezavo $f$.
+\end{itemize}~
+
+Oglejmo si sedaj implementacijo.
+
+\begin{verbatim}
+# Implementacija algoritma potisni-povisaj v Pythonu
+
+class Graf:
+    class Vozlisce:
+        def __init__(self, h, e):
+            self.h = h
+            self.e = e
+        
+    class Povezava:
+        def __init__(self, u, v, c, f):
+            self.u = u
+            self.v = v
+            self.c = c
+            self.f = f
+                
+    def __init__(self, V):
+        self.vozlisca = [self.Vozlisce(0, 0) for _ in range(V)]
+        self.povezave = []
+        
+    def maksimalni_pretok(self):
+        self.inicializiraj_predtok()
+        
+        while self.vozlisce_s_presezkom() != -1:
+            u = self.vozlisce_s_presezkom()
+            if not self.potisni(u):
+                self.povisaj(u)
+                
+        return self.vozlisca[len(self.vozlisca)-1].e
+        
+    def inicializiraj_predtok(self):
+        self.vozlisca[0].h = len(self.vozlisca)
+        
+        for i in range(len(self.povezave)):
+            if self.povezave[i].u == 0:
+                self.povezave[i].f = self.povezave[i].c
+                self.vozlisca[self.povezave[i].v].e =\
+                    self.povezave[i].f
+                self.posodobi_obratno_povezavo(i, self.povezave[i].f)
+    
+    def potisni(self, u):
+        for i in range(len(self.povezave)):
+            if self.povezave[i].u == u and\
+                    self.povezave[i].f < self.povezave[i].c and\
+                    self.vozlisca[u].h  == \
+                    self.vozlisca[self.povezave[i].v].h + 1:
+                delta = min(self.vozlisca[u].e,\
+                    self.povezave[i].c - self.povezave[i].f)
+                self.vozlisca[u].e -= delta
+                self.vozlisca[self.povezave[i].v].e += delta
+                self.povezave[i].f += delta
+                
+                self.posodobi_obratno_povezavo(i, delta)
+                return 1
+        return 0
+        
+    def povisaj(self, u):
+        min_v = sys.maxint
+        
+        for i in range(len(self.povezave)):
+            if self.povezave[i].u == u and\
+                    self.povezave[i].f < self.povezave[i].c and\
+                    self.vozlisca[self.povezave[i].v].h < min_v:
+                min_v = self.vozlisca[self.povezave[i].v].h
+        
+        self.vozlisca[u].h = min_v + 1;
+        
+    def vozlisce_s_presezkom(self):
+        for u in range(1, len(self.vozlisca)-1):
+            if self.vozlisca[u].e > 0:
+                return u
+        return -1
+        
+    def posodobi_obratno_povezavo(self, i, delta):
+        for j in range(len(self.povezave)):
+            if self.povezave[i].u == self.povezave[j].v and\
+                    self.povezave[i].v == self.povezave[j].u:
+                self.povezave[j].f -= delta
+                return
+        self.dodaj_povezavo(\
+            self.povezave[i].v, self.povezave[i].u, 0, -delta)
+        
+    def dodaj_povezavo(self, u, v, c, f):
+        self.povezave.append(self.Povezava(u, v, c, f))
+        
+
+def napolni_graf():
+    V = int(raw_input())
+    G = Graf(V)
+    
+    while True:
+        try:
+            u, v, c = raw_input().split()
+            G.dodaj_povezavo(int(u), int(v), int(c), 0)
+        except EOFError:
+            break
+    
+    return G
+            
+            
+if __name__ == '__main__':
+    import sys
+    
+    G = napolni_graf()
+    print "Maksimalni pretok je {0}.".format(G.maksimalni_pretok())
+
+\end{verbatim}~
+
+
+Opazimo dve naslednji dve stvari. Najpomembnejša stvar, ki jo opazimo je, da smo v metodi \texttt{makimalni\_pretok} zahtevali, da se program izvaja dokler obstaja vozlišče s presežkom. Spomnimo se, da smo v psevdokodi namreč zapisali, da se mora program izvajati dokler obstaja mogoča operacija potiska ali povišanja. Da sta stvari ekvivalentni, si bomo pogledali v dokazu pravilnosti algoritma (lema \ref{lem:potisk_ali_povisanje}).
+
+Druga stvar pa je, da metoda \texttt{potisni($u$)} sprejme le en argument, medtem ko smo v psevdokodi definirali operacijo kot \texttt{POTISNI($u$,$v$)}. Razlog je v tem, da smo zaradi lažje implementacije prestavili pregledovanje, v katere sosede lahko potisnemo tok, znotraj metode \texttt{potisni($u$)}, zato ne rabimo dveh vozlišč kot argumenta. S tem imata seveda operacija \texttt{POTISNI($u$,$v$)} in metoda \texttt{POTISNI($u$)} precej drugačno časovno zahtevnost.
+
+V programskem jeziku C++ je stvar skoraj povsem identična. Tu smo se le izognili razredom in podrazredom. Razred \texttt{Graf} smo povsem opustili in informacije o vozliščih in povezavah grafa shranili kar v globalni spremenljivki. Podrazreda \texttt{Vozlisce} in \texttt{Povezava} smo nadomestili s strukturama. Program je podrobneje pokomentiran, tako da na tem mestu ni smiselno navajati, kako deluje.
+
+\begin{verbatim}
+// Implementacija algoritma potisni-povisaj v C++.
+
+//===================================================================
+//
+//        KNJIZNICE IN DEFINICIJE
+//
+//===================================================================
+
+#include<iostream>
+#include<vector>
+#include<climits>
+#include<cstdio>
+
+using namespace std;
+
+// Vozlisce in povezavo predstavimo s strukturo.
+struct Vozlisce
+{
+    int h, e;
+    
+    Vozlisce(int h, int e)
+    {
+        this->h = h;
+        this->e = e;
+    }
+};
+
+struct Povezava
+{
+    int u, v;
+    int c;
+    int f;
+    
+    Povezava(int u, int v, int c, int f)
+    {
+        this->u = u;
+        this->v = v;
+        this->c = c;
+        this->f = f;
+    }
+};
+
+// Prototipi funkcij.
+int potisni_povisaj();
+void inicializiraj_predtok();
+int potisni(int u);
+void povisaj(int u);
+int vozlisce_s_presezkom();
+void posodobi_obratno_povezavo(int i, int delta);
+void napolni_graf();
+
+// Globalne spremenljivke.
+int V; // Stevilo vozlisc. Sicer velja V = vozlisca.size().
+vector<Vozlisce> vozlisca;
+vector<Povezava> povezave;
+
+//===================================================================
+//
+//        MAIN
+//
+//===================================================================
+
+// Main funkcija, uporabljena za testiranje programa.
+int main()
+{
+    // S standardnega vhoda preberi podatke o vozliscih
+    // in povezavah in napolni vektorja vozlisca in povezave.
+    napolni_graf();
+    
+    // Izvedi algoritem potisni-povisaj in izpisi rezultat.
+    cout << "Maksimalni pretok je " << potisni_povisaj() << endl;
+}
+
+//===================================================================
+//
+//        ALGORITEM
+//
+//===================================================================
+
+// Glavna funkcija algoritma potisni-povisaj. Najprej
+// inicializira predtok, potem pa izvaja operacije potiska
+// in povisanja, kakor je pac potrebno. To pocne, dokler
+// obstaja vozlisce s presezkom (to ne moreta biti s in t).
+int potisni_povisaj()
+{
+    inicializiraj_predtok();
+    
+    while (vozlisce_s_presezkom() != -1)
+    {
+        int u = vozlisce_s_presezkom();
+        
+        // Ce ne mores potisniti, potem povecaj visino vozlisca.
+        if (!potisni(u))
+            povisaj(u);
+    }
+    
+    // Vrni presezek v zadnjem vozliscu, to je ravno t.
+    return vozlisca[V-1].e;
+}
+
+// Inicializira predtok. To pomeni, da nastavi visino vozlisca s
+// in potisne tok iz s v vsa sosednja vozlisca. Pri tem zasici
+// povezave.
+void inicializiraj_predtok()
+{
+    // Visina vozlisca s je enaka stevilu vozlisc.
+    vozlisca[0].h = V;
+    
+    for (int i = 0; i < povezave.size(); i++)
+    {
+        // Ce se povezava zacne v vozliscu s...
+        if (povezave[i].u == 0)
+        {
+            // Zasici povezavo.
+            povezave[i].f = povezave[i].c;
+            
+            // Sosednje vozlisce dobi presezek toka.
+            vozlisca[povezave[i].v].e = povezave[i].f;
+            
+            // Posodobimo obratno povezavo. Ce je ni,
+            // se doda nova v residualnem grafu.
+            posodobi_obratno_povezavo(i, povezave[i].f);
+        }
+    }
+}
+
+// Operacija potisni. Najprej preverimo, ali se povezava zacne
+// v vozliscu u, ce je na povezavi se kaj residualne kapacitete,
+// torej ali je povezava se nezasicena. Ce je vozlisce u na
+// vecji visini kot sosed, potem izvrsi potisk.
+int potisni(int u)
+{
+    for (int i = 0; i < povezave.size(); i++)
+    {
+        // Prepricaj se, da pogoji drzijo.
+        if (povezave[i].u == u && povezave[i].f < povezave[i].c &&
+                vozlisca[u].h == vozlisca[povezave[i].v].h + 1)
+        {
+            // Potisnemo lahko manjse izmed presezka vozlisca u
+            // ter residualne kapacitete povezave.
+            int delta =
+                min(vozlisca[u].e, povezave[i].c - povezave[i].f);
+            
+            // Presezek u je pomanjsan za toliko,
+            // kolikor smo potisnili.
+            vozlisca[u].e -= delta;
+        
+            // V sosedu se za ravno toliko poveca presezek.
+            vozlisca[povezave[i].v].e += delta;
+        
+            // Tok cez povezavo se poveca.
+            povezave[i].f += delta;
+        
+            // Posodobimo tok po obratni povezavi. Ce povezave
+            // ni, jo dodamo v residualnem grafu.
+            posodobi_obratno_povezavo(i, delta);
+        
+            // Potisk uspesen.
+            return 1;
+        }
+    }
+    
+    // Nismo uspeli najti povezavi, po kateri bi lahko izvrsili
+    // potisk. To pomeni, da bo vozliscu potrebno povecati visino.
+    return 0;
+}
+
+// Operacija povisaj. Nastavi visino vozlisca u na minimum visin
+// sosednjih vozlisc + 1.
+void povisaj(int u)
+{
+    // Zacetna minimalna visina naj bo nekaj velikega.
+    int min_visina_sosedov = INT_MAX;
+    
+    for (int i = 0; i < povezave.size(); i++)
+    {
+        // Prepricati se moramo, da se povezava zacne v u
+        // in da ni nasicena. Ce velja se, da je visina
+        // drugega konca povezave (torej soseda od u) manjsa
+        // kot trenutna najmanjsa, posodobimo trenutno najmanjso.
+        if (povezave[i].u == u && povezave[i].f < povezave[i].c &&
+                vozlisca[povezave[i].v].h < min_visina_sosedov)
+            min_visina_sosedov = vozlisca[povezave[i].v].h;
+    }
+    
+    // Spremenimo visino vozlisca u na 1 + minimalna visina sosedov.
+    vozlisca[u].h = min_visina_sosedov + 1;
+}
+
+//===================================================================
+//
+//        POMOZNE FUNKCIJE
+//
+//===================================================================
+
+// Poisce vozlisce s presezkom in vrne njegov indeks.
+// Ce vozlisca ne najde, vrne sentinel.
+int vozlisce_s_presezkom()
+{
+    for (int u = 1; u < V-1; u++)
+    {
+        if (vozlisca[u].e > 0)
+            return u;
+    }
+    
+    return -1;
+}
+
+// Posodobi tok na obratni povezavi (povezavi, ki ima
+// konca v istih vozliscih, kakor tista, po kateri smo
+// potisnili tok, in kaze v drugo smer). Ce te povezave
+// ni, jo dodaj v residualnem grafu.
+void posodobi_obratno_povezavo(int i, int delta)
+{
+    for (int j = 0; j < povezave.size(); j++)
+    {
+        // Prepricamo se, da gre za obratno povezavo.
+        if (povezave[i].u == povezave[j].v &&
+                povezave[i].v == povezave[j].u)
+        {
+            // Odstej tok, ki je bil potisnjen in koncaj.
+            povezave[j].f -= delta;
+            return;
+        }
+    }
+    
+    // Ni bilo obratne povezave. To pomeni, da jo moramo
+    // dodati v residualnem grafu.
+    povezave.push_back(
+        Povezava(povezave[i].v, povezave[i].u, 0, -delta));
+}
+
+
+// S standardnega vhoda prebere podatke o grafu
+// in napolni vektorja vozlisc in povezav.
+void napolni_graf()
+{
+    scanf("%d\n", &V);
+    for (int i = 0; i < V; i++)
+        vozlisca.push_back(Vozlisce(0, 0));
+    
+    int u, v, c;
+    while (scanf("%d %d %d\n", &u, &v, &c) != EOF)
+        povezave.push_back(Povezava(u, v, c, 0));
+}
+
+//===================================================================
+
+\end{verbatim}
+
+
+\subsection{O pravilnosti delovanja algoritma}
+
+V tem podrazdelku bomo s pomočjo pomožnih lem pokazali, da algoritem potisni-povišaj deluje pravilno. S tem mislimo na to, da se algoritem konča in ob tem vrne pravilen rezultat, torej res pretok, ki je maksimalen.
+
+\begin{definicija}\label{def:visinska_funkcija}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje. \textbf{Višinska funkcija} je funkcija $h\colon V \rightarrow \N_0$, za katero velja
+\begin{enumerate}
+\item $h(s) = |V|$ in $h(t) = 0$,
+\item $h(u) \leq h(v) + 1$, za vsako povezavo $(u,v) \in E_f$.
+\end{enumerate}
+\end{definicija}
+
+Če si pogledamo, kako deluje operacija potisni, vidimo, da nikjer v kodi ne uporabimo dejstva, da je razlika višine med vozliščema nujno ena. Vendar to še vseeno zahtevamo.
+
+\begin{lema}
+Naj bo $G = (V,E)$ pretočno omrežje, $f\colon V \times V \rightarrow \N_0$ predtok v $G$ in $h\colon V \rightarrow \N_0$ višinska funkcija. Potem za vsaki vozlišči $u,v \in V$ velja, da če je $h(u) > h(v) + 1$, potem povezava $(u,v)$ ni v residualnem omrežju.
+\end{lema}
+
+Ta lema nam pove, da ne obstaja residualna povezava med $u$ in $v$, če je $h(u) > h(v) + 1$. To pomeni, da če potisnemo tok v vozlišče za več kot ena nižje, ne bomo naredili nič konkretnega, kar se je preprosto prepričati. Pravzaprav lahko algoritem v tem primeru deluje celo napačno.
+
+% zgled
+
+Sedaj si poglejmo obljubljeno lemo, ki nam zagotavlja pravilnost delovanja algoritma. Spomnimo se namreč, da smo v implementaciji algoritem opravljali, dokler je bilo kakšno vozlišče s presežkom toka, čeprav smo v psevdokodi zapisali, da moramo algoritem opravljati dokler je mogoča katera izmed operacij potisni in povišaj.
+
+\begin{lema}[na vozlišču s presežkom lahko opravimo ali potisk ali povišanje]\label{lem:potisk_ali_povisanje}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predtok, $h$ višinska funkcija in $e\times V \rightarrow \N_0$ funkcija, ki za vsako vozlišče pove, kolikšen je v njem presežek toka. Če ima vozlišče $u\in V$ presežek toka, torej $e(u) > 0$, potem lahko na tem vozlišču opravimo ali operacijo potisni ali operacijo povišaj.
+\end{lema}
+
+\begin{dokaz}
+Naj ima $u$ presežek toka. Za vsako residualno povezavo $(u,v)$ velja $h(u) \leq h(v) + 1$, ker je $h$ višinska funkcija. Če ne moremo opraviti operacije potisni, potem za vse residualne povezave $(u,v)$ velja $h(u) < h(v)+1$, oziroma $h(u) \leq h(v)$. Torej lahko opravimo operacijo povišanja.
+\end{dokaz}
+
+Oglejmo si dve lemi o višinski funkciji.
+
+\begin{lema}[višine vozlišč se nikoli ne zmanjšajo]\label{lem:visina_ne_pada}
+Med izvajanjem programa \texttt{POTISNI -POVIŠAJ} velja za vsako vozlišče $u \in V$, da se $h(u)$ nikoli ne zmanjša. Še več, vsakič, ko na $u$ opravimo povišanje, se njegova višina poveča za vsaj ena.
+\end{lema}
+
+\begin{dokaz}
+Ker se višine vozlišč spreminjajo le med povišanji, je za dokaz celotne leme zadosti pokazati drugi del leme. Naj bo sedaj $u$ vozlišče, na katerem opravljamo povišanje. Torej za vse $v \in V$, za katere je $(u,v) \in E_f$, velja $h(u) \leq h(v)$. Ker to velja za vsak $v$, velja tudi \[u \leq \min_{(u,v) \in E_f} h(v)\,\] kar pa je ekvivalentno \[u < 1 + \min_{(u,v) \in E_f} h(v).\]
+\end{dokaz}
+
+\begin{lema}
+Med izvajanjem programa \texttt{POTISNI-POVIŠAJ($G$,$s$)} $h$ vedno zadrži lastnosti višinske funkcije, opisane v definiciji \ref{def:visinska_funkcija}.
+\end{lema}
+
+\begin{dokaz}
+Dokaz bomo naredili s pomočjo indukcije na število osnovnih operacij.
+
+Po inicializaciji predtoka je $h$ očitno višinska funkcija.
+
+Poglejmo si najprej, kaj se zgodi med operacijo \texttt{POVIŠAJ($u$)}. \texttt{POVIŠAJ($u$)} zagotovi, da za vsako residualno povezavo $(u,v) \in E_f$ po opravljeni operaciji velja $h(u) \leq h(v) +1$. Vzemimo sedaj residualno povezavo, ki vstopa v $u$, recimo $(w,u) \in E_f$. Po lemi \ref{lem:visina_ne_pada} iz $h(w) \leq h(u) + 1$ pred operacijo sledi $h(w) < h(u) + 1$ po operaciji. Torej operacija \texttt{POVIŠAJ($u$)} očitno ohranja $h$ kot višinsko funkcijo.
+
+Ostane nam pokazati še, da če je $h$ višinska funkcija pred operacijo \texttt{POTISNI($u$,$v$)}, potem je tudi po operaciji. Med to operacijo se zgodi natanko ena izmed naslednjih stvari:
+
+\begin{enumerate}
+\item \textit{Dodamo residualno povezavo $(v,u)$ v $E_f$.} V tem primeru imamo $h(v) = h(u) - 1 < h(u) + 1$, torej $h$ ostane višinska funkcija.
+\item \textit{Odstranimo residualno povezavo $(u,v)$ iz $E_f$.} Z odstranitvijo residualne povezave $(u,v)$ pravzaprav izgubimo zahtevo iz definicije višinske funkcije (definicija \ref{def:visinska_funkcija}), tako da $h$ na prazno ostane višinska funkcija.
+\end{enumerate}
+
+Ker vse operacije ohranjajo lastnosti višinske funkcije funkcije $h$, po principu indukcije sledi lema.
+\end{dokaz}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section*{Slovar strokovnih izrazov}
+
+\geslo{}{}
+\geslo{}{}
+
+
+% seznam uporabljene literature
+\begin{thebibliography}{99}
+
+%\bibitem{}
+
+\end{thebibliography}
+
+\end{document}
+
