@@ -92,6 +92,7 @@ void inicializiraj_predtok()
 		f[0][v] = c[0][v];
 		vozlisca[v].e = f[0][v];
 		f[v][0] -= f[0][v];
+		vozlisca[0].e -= f[0][v];
 		vozlisca[v].sosedi.push_back(0);
 		
 		if (v != vozlisca.size()-1)
