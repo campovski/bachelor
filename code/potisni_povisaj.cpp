@@ -1,3 +1,31 @@
+
+Skip to content
+This repository
+
+    Pull requests
+    Issues
+    Gist
+
+    @campovski
+
+1
+0
+
+    0
+
+campovski/bachelor
+Code
+Issues 0
+Pull requests 0
+Projects 0
+Wiki
+Pulse
+Graphs
+Settings
+bachelor/code/potisni_povisaj.cpp
+81c60b1 an hour ago
+@campovski campovski Move slow algorithms to deprecated and add new commented implementation.
+237 lines (192 sloc) 5.63 KB
 // Implementacija algoritma potisni-povisaj v C++,
 // ki deluje v O(V^2*E).
 // Za vec informacij o algoritmu obiscite
@@ -179,15 +207,12 @@ void potisni(int u, int v)
     // Doda obratno povezavo.
     vozlisca[v].sosedi.push_back(u);
     
-    // Z vozliscem smo (za sedaj) opravili. Ce je v njem
-    // se vedno ostal presezek, ga doda v vrsto.
-    presezki.pop();
-    viden[u] = false;
-    if (vozlisca[u].e > 0)
+    // Ce smo z vozliscem opravili, ga odstranimo iz presezkov.
+    if (vozlisca[u].e == 0)
     {
-    	presezki.push(u);
-    	viden[u] = true;
-   	}
+		presezki.pop();
+		viden[u] = false;
+	}
     
     // Ce konec povezave ni t, ga doda v presezke.
     if (v != vozlisca.size()-1 && v != 0 && !viden[v])
