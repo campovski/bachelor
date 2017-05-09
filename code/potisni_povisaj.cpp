@@ -19,12 +19,10 @@
 using namespace std;
 
 // Vozlisce predstavimo s strukturo. Za vsako vozlisce si zapomnimo
-// njegovo visino in sosede (da lahko do sosedov dostopamo v O(V)
-// namesto v O(E).
+// njegovo visino in presezek toka v njem.
 struct Vozlisce
 {
 	int h, e;
-	vector<int> sosedi;
 	
 	Vozlisce(int h, int e)
 	{
@@ -56,6 +54,14 @@ queue<int> presezki;
 // presezke. S tem dosezemo, da se vsako vozlisce v presezkih
 // pojavi kvecjemu enkrat.
 vector<bool>viden;
+
+// Matrika povezav grafa. Ce je p[i][j] true, to pomeni, da
+// povezava obstaja. S tem se izognemo temu, da bi se v sosedih
+// vozlisc zaceli sosedi ponavljati. Prej smo namrec za vsako
+// vozlisce imeli vektor sosedov in s tem ponazorili povezave.
+// V obeh primerih s tem zmanjsamo casovno zahtevnost iz O(E)
+// na O(V).
+bool** p;
 
 int** c; // Matrika kapacitet povezav.
 int** f; // Matrika toka.
@@ -92,7 +98,9 @@ int potisni_povisaj()
 	inicializiraj_predtok();
 	
 	// Dokler ima katero izmed vozlisc presezek toka,
-	// moramo opraviti ali POTISNI ali POVISAJ.
+	// moramo opraviti ali POTISNI ali POVISAJ. Ce opravimo
+	// POVISAJ, lahko takoj potem tudi potisnemo na tisto
+	// vozlisce. S tem si zmanjsamo stevilo zank.
 	while (presezki.size() > 0)
 	{
 		int u = presezki.front();
@@ -100,8 +108,16 @@ int potisni_povisaj()
 		
 		if (vozlisca[v].h < vozlisca[u].h)
 			potisni(u, v);
-		else povisaj(u, vozlisca[v].h);
+		else
+		{
+			povisaj(u, vozlisca[v].h);
+			potisni(u,v);
+		}
 	}
+	
+	// Da preverimo, ali se oddani tok ujema s prejetim, da ga ni
+	// slucajno ostalo kaj vmes. (Za nekaksno lahko preverjanje.)
+	cout << "e(s) = " << vozlisca[0].e << endl;
 	
 	// Vrnemo presezek v vozliscu t. Lahko bi vrnili
 	// tudi -presezek v vozliscu s.
@@ -116,26 +132,29 @@ void inicializiraj_predtok()
 {
 	vozlisca[0].h = vozlisca.size();
 	
-	for (int v : vozlisca[0].sosedi)
+	for (int v = 0; v < vozlisca.size(); v++)
 	{
-		// Zasici povezavo.
-		f[0][v] = c[0][v];
-		
-		// Nastavi presezek v sosedu.
-		vozlisca[v].e = f[0][v];
-		
-		// Doda residualno povezavo.
-		f[v][0] -= f[0][v];
-		vozlisca[v].sosedi.push_back(0);
-		
-		// V vozliscu s posodobi oddani tok.
-		vozlisca[0].e -= f[0][v];
-		
-		// Ce vozlisce ni t, ga doda v presezke.
-		if (v != vozlisca.size()-1)
+		if (p[0][v])
 		{
-		    presezki.push(v);
-		    viden[v] = true;
+			// Zasici povezavo.
+			f[0][v] = c[0][v];
+		
+			// Nastavi presezek v sosedu.
+			vozlisca[v].e = f[0][v];
+		
+			// Doda residualno povezavo.
+			f[v][0] -= f[0][v];
+			p[v][0] = true;
+		
+			// V vozliscu s posodobi oddani tok.
+			vozlisca[0].e -= f[0][v];
+		
+			// Ce vozlisce ni t, ga doda v presezke.
+			if (v != vozlisca.size()-1)
+			{
+				presezki.push(v);
+				viden[v] = true;
+			}
 		}
 	}
 }
@@ -147,15 +166,18 @@ int najnizji_sosed(int u)
 	int sosed;
 	int min_visina = INT_MAX;
 		
-	for (int v : vozlisca[u].sosedi)
+	for (int v = 0; v < vozlisca.size(); v++)
 	{
-		// Ce je visina soseda manjsa od trenutne najmanjse
-		// visine in ce povezava ni zasicena, potem je to
-		// kandidat za najnizjega soseda.
-		if (vozlisca[v].h < min_visina && c[u][v] - f[u][v] > 0)
+		if (p[u][v])
 		{
-			min_visina = vozlisca[v].h;
-			sosed = v;
+			// Ce je visina soseda manjsa od trenutne najmanjse
+			// visine in ce povezava ni zasicena, potem je to
+			// kandidat za najnizjega soseda.
+			if (vozlisca[v].h < min_visina && c[u][v] - f[u][v] > 0)
+			{
+				min_visina = vozlisca[v].h;
+				sosed = v;
+			}
 		}
 	}
 	
@@ -177,7 +199,7 @@ void potisni(int u, int v)
     f[v][u] -= delta;
     
     // Doda obratno povezavo.
-    vozlisca[v].sosedi.push_back(u);
+    p[v][u] = true;
     
     // Ce smo z vozliscem opravili, ga odstranimo iz presezkov.
     if (vozlisca[u].e == 0)
@@ -213,13 +235,15 @@ void napolni_graf()
 	
 	c = (int**) malloc(V*sizeof(int*));
 	f = (int**) malloc(V*sizeof(int*));
+	p = (bool**) malloc(V*sizeof(int*));
 	
     for (int i = 0; i < V; i++)
     {
         vozlisca.push_back(Vozlisce(0, 0));
         viden.push_back(false);
     	c[i] = (int*) malloc(V*sizeof(int));
-    	f[i] = (int*) malloc(V*sizeof(int));    
+    	f[i] = (int*) malloc(V*sizeof(int)); 
+    	p[i] = (bool*) malloc(V*sizeof(bool));   
     }
         
     
@@ -227,7 +251,7 @@ void napolni_graf()
     while (scanf("%d %d %d\n", &u, &v, &kapaciteta) != EOF)
     {
     	c[u][v] += kapaciteta;
-    	vozlisca[u].sosedi.push_back(v);
+    	p[u][v] = 1;
     }
 }
 
