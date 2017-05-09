@@ -27,6 +27,7 @@ void napolni_graf();
 
 vector<Vozlisce> vozlisca;
 queue<int> presezki; // stack indexov vozlisc v presezku
+vector<bool>viden;
 int** c;
 int** f;
 
@@ -94,7 +95,10 @@ void inicializiraj_predtok()
 		vozlisca[v].sosedi.push_back(0);
 		
 		if (v != vozlisca.size()-1)
+		{
 		    presezki.push(v);
+		    viden[v] = true;
+		}
 	}
 }
 
@@ -128,11 +132,18 @@ void potisni(int u, int v)
     vozlisca[v].sosedi.push_back(u);
     
     presezki.pop();
+    viden[u] = false;
     if (vozlisca[u].e > 0)
+    {
     	presezki.push(u);
+    	viden[u] = true;
+   	}
     
-    if (v != vozlisca.size()-1 && v != 0)
+    if (v != vozlisca.size()-1 && v != 0 && !viden[v])
+    {
     	presezki.push(v);
+    	viden[v] = true;
+    }
 }
 
 void povisaj(int u, int h)
@@ -152,6 +163,7 @@ void napolni_graf()
     for (int i = 0; i < V; i++)
     {
         vozlisca.push_back(Vozlisce(0, 0));
+        viden.push_back(false);
     	c[i] = (int*) malloc(V*sizeof(int));
     	f[i] = (int*) malloc(V*sizeof(int));    
     }
