@@ -1,4 +1,5 @@
-// Implementacija algoritma potisni-povisaj v C++.
+// Implementacija algoritma potisni-povisaj v C++,
+// ki deluje v O(V^2*E).
 // Za vec informacij o algoritmu obiscite
 // https://en.wikipedia.org/wiki/Push-povisaj_maximum_flow_algorithm
 // povezava na github...
@@ -10,52 +11,54 @@
 //===================================================================
 
 #include<iostream>
-#include<vector>
-#include<climits>
+#include<queue>
 #include<cstdio>
+#include<cstdlib>
+#include<climits>
 
 using namespace std;
 
-// Vozlisce in povezavo predstavimo s strukturo.
+// Vozlisce predstavimo s strukturo. Za vsako vozlisce si zapomnimo
+// njegovo visino in sosede (da lahko do sosedov dostopamo v O(V)
+// namesto v O(E).
 struct Vozlisce
 {
-    int h, e;
-    
-    Vozlisce(int h, int e)
-    {
-        this->h = h;
-        this->e = e;
-    }
-};
-
-struct Povezava
-{
-    int u, v;
-    int c;
-    int f;
-    
-    Povezava(int u, int v, int c, int f)
-    {
-        this->u = u;
-        this->v = v;
-        this->c = c;
-        this->f = f;
-    }
+	int h, e;
+	vector<int> sosedi;
+	
+	Vozlisce(int h, int e)
+	{
+		this->h = h;
+		this->e = e;
+	}
 };
 
 // Prototipi funkcij.
 int potisni_povisaj();
 void inicializiraj_predtok();
-int potisni(int u);
-void povisaj(int u);
-int vozlisce_s_presezkom();
-void posodobi_obratno_povezavo(int i, int delta);
+void potisni(int u, int v);
+void povisaj(int u, int h);
+int najnizji_sosed(int u);
 void napolni_graf();
 
 // Globalne spremenljivke.
-int V; // Stevilo vozlisc. Sicer velja V = vozlisca.size().
+
+// Graf predstavimo z vektorjem vozlisc. Povezav si ne rabimo
+// zapomniti, saj ima vsako vozlisce podatke o svojih sosedih.
 vector<Vozlisce> vozlisca;
-vector<Povezava> povezave;
+
+// V vrsto dajemo vozlisca, ki so v presezku. S tem lahko v
+// O(1) dostopamo do naslednjega vozlisca, na katerem je potrebno
+// opraviti operacijo POTISNI ali POVISAJ.
+queue<int> presezki;
+
+// V vektor shranjujemo vozlisca, ki smo jih ze dodali med
+// presezke. S tem dosezemo, da se vsako vozlisce v presezkih
+// pojavi kvecjemu enkrat.
+vector<bool>viden;
+
+int** c; // Matrika kapacitet povezav.
+int** f; // Matrika toka.
 
 //===================================================================
 //
@@ -70,7 +73,7 @@ int main()
     // in povezavah in napolni vektorja vozlisca in povezave.
     napolni_graf();
     
-    // Izvedi algoritem potisni-povisaj in izpisi rezultat.
+    // Izvedi algoritem POTISNI-POVISAJ in izpisi rezultat.
     cout << "Maksimalni pretok je " << potisni_povisaj() << endl;
 }
 
@@ -86,164 +89,148 @@ int main()
 // obstaja vozlisce s presezkom (to ne moreta biti s in t).
 int potisni_povisaj()
 {
-    inicializiraj_predtok();
-    
-    while (vozlisce_s_presezkom() != -1)
-    {
-        int u = vozlisce_s_presezkom();
-        
-        // Ce ne mores potisniti, potem povecaj visino vozlisca.
-        if (!potisni(u))
-            povisaj(u);
-    }
-    
-    // Vrni presezek v zadnjem vozliscu, to je ravno t.
-    return vozlisca[V-1].e;
+	inicializiraj_predtok();
+	
+	// Dokler ima katero izmed vozlisc presezek toka,
+	// moramo opraviti ali POTISNI ali POVISAJ.
+	while (presezki.size() > 0)
+	{
+		int u = presezki.front();
+		int v = najnizji_sosed(u);
+		
+		if (vozlisca[v].h < vozlisca[u].h)
+			potisni(u, v);
+		else povisaj(u, vozlisca[v].h);
+	}
+	
+	// Vrnemo presezek v vozliscu t. Lahko bi vrnili
+	// tudi -presezek v vozliscu s.
+	return vozlisca.back().e;
 }
 
-// Inicializira predtok. To pomeni, da nastavi visino vozlisca s
-// in potisne tok iz s v vsa sosednja vozlisca. Pri tem zasici
-// povezave.
+
+// Inicializira predtok. Visino vozlisca s nastavi na
+// |V|, zasici povezave iz s, doda residualne povezave
+// in ce sosed ni vozlisce t, ga doda v presezke.
 void inicializiraj_predtok()
 {
-    // Visina vozlisca s je enaka stevilu vozlisc.
-    vozlisca[0].h = V;
-    
-    for (int i = 0; i < povezave.size(); i++)
-    {
-        // Ce se povezava zacne v vozliscu s...
-        if (povezave[i].u == 0)
-        {
-            // Zasici povezavo.
-            povezave[i].f = povezave[i].c;
-            
-            // Sosednje vozlisce dobi presezek toka.
-            vozlisca[povezave[i].v].e = povezave[i].f;
-            
-            // Posodobimo obratno povezavo. Ce je ni,
-            // se doda nova v residualnem grafu.
-            posodobi_obratno_povezavo(i, povezave[i].f);
-        }
-    }
+	vozlisca[0].h = vozlisca.size();
+	
+	for (int v : vozlisca[0].sosedi)
+	{
+		// Zasici povezavo.
+		f[0][v] = c[0][v];
+		
+		// Nastavi presezek v sosedu.
+		vozlisca[v].e = f[0][v];
+		
+		// Doda residualno povezavo.
+		f[v][0] -= f[0][v];
+		vozlisca[v].sosedi.push_back(0);
+		
+		// V vozliscu s posodobi oddani tok.
+		vozlisca[0].e -= f[0][v];
+		
+		// Ce vozlisce ni t, ga doda v presezke.
+		if (v != vozlisca.size()-1)
+		{
+		    presezki.push(v);
+		    viden[v] = true;
+		}
+	}
 }
 
-// Operacija potisni. Najprej preverimo, ali se povezava zacne
-// v vozliscu u, ce je na povezavi se kaj residualne kapacitete,
-// torej ali je povezava se nezasicena. Ce je vozlisce u na
-// vecji visini kot sosed, potem izvrsi potisk.
-int potisni(int u)
+
+// Vrne indeks najnizjega soseda.
+int najnizji_sosed(int u)
 {
-    for (int i = 0; i < povezave.size(); i++)
-    {
-        // Prepricaj se, da pogoji drzijo.
-        if (povezave[i].u == u && povezave[i].f < povezave[i].c &&
-                vozlisca[u].h > vozlisca[povezave[i].v].h)
-        {
-            // Potisnemo lahko manjse izmed presezka vozlisca u
-            // ter residualne kapacitete povezave.
-            int delta =
-                min(vozlisca[u].e, povezave[i].c - povezave[i].f);
-            
-            // Presezek u je pomanjsan za toliko,
-            // kolikor smo potisnili.
-            vozlisca[u].e -= delta;
-        
-            // V sosedu se za ravno toliko poveca presezek.
-            vozlisca[povezave[i].v].e += delta;
-        
-            // Tok cez povezavo se poveca.
-            povezave[i].f += delta;
-        
-            // Posodobimo tok po obratni povezavi. Ce povezave
-            // ni, jo dodamo v residualnem grafu.
-            posodobi_obratno_povezavo(i, delta);
-        
-            // Potisk uspesen.
-            return 1;
-        }
-    }
-    
-    // Nismo uspeli najti povezavi, po kateri bi lahko izvrsili
-    // potisk. To pomeni, da bo vozliscu potrebno povecati visino.
-    return 0;
+	int sosed;
+	int min_visina = INT_MAX;
+		
+	for (int v : vozlisca[u].sosedi)
+	{
+		// Ce je visina soseda manjsa od trenutne najmanjse
+		// visine in ce povezava ni zasicena, potem je to
+		// kandidat za najnizjega soseda.
+		if (vozlisca[v].h < min_visina && c[u][v] - f[u][v] > 0)
+		{
+			min_visina = vozlisca[v].h;
+			sosed = v;
+		}
+	}
+	
+	return sosed;
 }
 
-// Operacija povisaj. Nastavi visino vozlisca u na minimum visin
-// sosednjih vozlisc + 1.
-void povisaj(int u)
+// Operacija POTISNI. Potisne lahko minimum med presezkom
+// v vozliscu in residualno kapaciteto povezave.
+void potisni(int u, int v)
 {
-    // Zacetna minimalna visina naj bo nekaj velikega.
-    int min_visina_sosedov = INT_MAX;
+	int delta = min(vozlisca[u].e, c[u][v] - f[u][v]);
     
-    for (int i = 0; i < povezave.size(); i++)
+    // Posodobi presezek v krajiscih povezave.
+    vozlisca[u].e -= delta;
+    vozlisca[v].e += delta;
+    
+    // Posodobi tok prek povezave in residualne povezave.
+    f[u][v] += delta;
+    f[v][u] -= delta;
+    
+    // Doda obratno povezavo.
+    vozlisca[v].sosedi.push_back(u);
+    
+    // Z vozliscem smo (za sedaj) opravili. Ce je v njem
+    // se vedno ostal presezek, ga doda v vrsto.
+    presezki.pop();
+    viden[u] = false;
+    if (vozlisca[u].e > 0)
     {
-        // Prepricati se moramo, da se povezava zacne v u
-        // in da ni nasicena. Ce velja se, da je visina
-        // drugega konca povezave (torej soseda od u) manjsa
-        // kot trenutna najmanjsa, posodobimo trenutno najmanjso.
-        if (povezave[i].u == u && povezave[i].f < povezave[i].c &&
-                vozlisca[povezave[i].v].h < min_visina_sosedov)
-            min_visina_sosedov = vozlisca[povezave[i].v].h;
-    }
+    	presezki.push(u);
+    	viden[u] = true;
+   	}
     
-    // Spremenimo visino vozlisca u na 1 + minimalna visina sosedov.
-    vozlisca[u].h = min_visina_sosedov + 1;
+    // Ce konec povezave ni t, ga doda v presezke.
+    if (v != vozlisca.size()-1 && v != 0 && !viden[v])
+    {
+    	presezki.push(v);
+    	viden[v] = true;
+    }
 }
 
-//===================================================================
-//
-//        POMOZNE FUNKCIJE
-//
-//===================================================================
-
-// Poisce vozlisce s presezkom in vrne njegov indeks.
-// Ce vozlisca ne najde, vrne sentinel.
-int vozlisce_s_presezkom()
+// Operacija POVISAJ. Vozliscu nastavi visino na prej
+// izracunano minimalno visino "dobrih" sosedov h + 1.
+void povisaj(int u, int h)
 {
-    for (int u = 1; u < V-1; u++)
-    {
-        if (vozlisca[u].e > 0)
-            return u;
-    }
-    
-    return -1;
-}
-
-// Posodobi tok na obratni povezavi (povezavi, ki ima
-// konca v istih vozliscih, kakor tista, po kateri smo
-// potisnili tok, in kaze v drugo smer). Ce te povezave
-// ni, jo dodaj v residualnem grafu.
-void posodobi_obratno_povezavo(int i, int delta)
-{
-    for (int j = 0; j < povezave.size(); j++)
-    {
-        // Prepricamo se, da gre za obratno povezavo.
-        if (povezave[i].u == povezave[j].v &&
-                povezave[i].v == povezave[j].u)
-        {
-            // Odstej tok, ki je bil potisnjen in koncaj.
-            povezave[j].f -= delta;
-            return;
-        }
-    }
-    
-    // Ni bilo obratne povezave. To pomeni, da jo moramo
-    // dodati v residualnem grafu.
-    povezave.push_back(
-        Povezava(povezave[i].v, povezave[i].u, 0, -delta));
+	vozlisca[u].h = h + 1;
 }
 
 
-// S standardnega vhoda prebere podatke o grafu
-// in napolni vektorja vozlisc in povezav.
+// Iz datoteke prebere podatke o stevilu vozlisc in
+// povezavah. V vektor vozlisc doda vozlisca, ki jim
+// nastavi visino in presezek na 0. Vsakemu vozliscu
+// nato doda sosede in nastavi kapaciteto povezav.
 void napolni_graf()
 {
-    scanf("%d\n", &V);
+	int V;
+	scanf("%d\n", &V);
+	
+	c = (int**) malloc(V*sizeof(int*));
+	f = (int**) malloc(V*sizeof(int*));
+	
     for (int i = 0; i < V; i++)
+    {
         vozlisca.push_back(Vozlisce(0, 0));
+        viden.push_back(false);
+    	c[i] = (int*) malloc(V*sizeof(int));
+    	f[i] = (int*) malloc(V*sizeof(int));    
+    }
+        
     
-    int u, v, c;
-    while (scanf("%d %d %d\n", &u, &v, &c) != EOF)
-        povezave.push_back(Povezava(u, v, c, 0));
+    int u, v, kapaciteta;
+    while (scanf("%d %d %d\n", &u, &v, &kapaciteta) != EOF)
+    {
+    	c[u][v] += kapaciteta;
+    	vozlisca[u].sosedi.push_back(v);
+    }
 }
 
