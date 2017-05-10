@@ -1,0 +1,152 @@
+\documentclass[t]{beamer}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[slovene]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{tikz}
+
+\newcounter{countDefinicija}
+\newenvironment{definicija}{\noindent\refstepcounter{countDefinicija}\textbf{Definicija \arabic{countDefinicija} }\itshape}{\\~}
+
+\newcounter{countTrditev}
+\newenvironment{trditev}{\noindent\refstepcounter{countTrditev}\textbf{Trditev \arabic{countTrditev} }\itshape}{\\~}
+
+\newcommand{\fillblack}[1]{
+\begin{tikzpicture}[remember picture, overlay]
+    \node [shift={(0 cm,0cm)}]  at (current page.south west)
+        {%
+        \begin{tikzpicture}[remember picture, overlay] at (current page.south west)
+            \draw [fill=black] (0, 0) -- (0,#1 \paperheight) --
+                              (\paperwidth,#1 \paperheight) -- (\paperwidth,0) -- cycle ;
+        \end{tikzpicture}
+        };
+        \draw (current page.north west) rectangle (current page.south east);
+\end{tikzpicture}
+}
+
+%\usetheme{warsaw}
+
+
+\begin{document}
+\title{Algoritem potisni-povišaj za iskanje maksimalnega pretoka}
+\author{Marcel Čampa}
+\institute{Fakulteta za matematiko in fiziko}
+\date{\today}
+
+\maketitle
+
+
+\section{Osnovne definicije}
+
+\begin{frame}
+\begin{definicija}
+\textbf{Graf} $G$ je par množic $G = (V,E)$, kjer je $G$ množica vozlišč grafa, $E$ pa je množica povezav grafa $G$.
+\end{definicija}
+
+\begin{definicija}
+Naj bo $G = (V, E)$ graf. \textbf{Omrežje} na grafu $G$ je par $(G, c)$, kjer je $c \colon V \times V \rightarrow \mathbb{R}_+ \cup \{\infty\}$ \textbf{funkcija prepustnosti}, ki vsaki povezavi $(u,v)$ priredi njeno prepustnost $c(u,v)$. Prepustnost $c(u,v) = \infty$ natanko tedaj, ko prepustnost povezave ni omejena.
+\end{definicija}
+
+Rekli bomo še, da $c(u,v)=0$ natanko tedaj, ko povezava ne obstaja.
+
+\fillblack{0.33}
+
+\end{frame}
+
+\begin{frame}
+\begin{definicija}
+Naj bo $G = (V,E)$ graf in $(G,c)$ omrežje na grafu $G$. \textbf{Pretočno omrežje} na omrežju $(G,c)$ je četverica $(G,c,s,t)$, kjer je $s\in V$ začetno vozlišče pretočnega omrežja, rečemo mu \textbf{izvir}, $t\in V$ pa končno vozlišče pretočnega omrežja, ki mu pravimo \textbf{ponor}.
+\end{definicija}
+
+Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč privzemamo, da imamo neko funkcijo prepustnosti $c$.
+
+\fillblack{0.4}
+\end{frame}
+
+\begin{frame}
+\begin{definicija}
+\textbf{Psevdopretok} je funkcija $f \colon V \times V \rightarrow \mathbb{R}$, ki zadošča pogojema
+\begin{enumerate}
+\item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) = - f(v,u)$.
+\item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija prepustnosti.
+\end{enumerate}~
+\end{definicija}
+\begin{definicija}
+\textbf{Funkcija presežka} za psevdopretok $f$ je funkcija $e_f \colon V \rightarrow \mathbb{R}$, definirana z $e_f(u) = \sum_{v \in V} f(v,u)$. Če je $e_f(u) > 0$, pravimo, da je $u$ \textbf{v presežku}.
+\end{definicija}
+\fillblack{0.4}
+\end{frame}
+
+\begin{frame}
+\begin{definicija}
+\textbf{Residualna prepustnost} povezave glede na trenuten psevdopretok $f$ je funkcija $c_f \colon V \times V \rightarrow \mathbb{R}_+$, definirana kot razlika prepustnosti povezave in trenutnega toka preko nje. Velja torej $c_f(u,v) = c(u,v) - f(u,v)$.
+\end{definicija}
+
+\begin{definicija}
+\textbf{Predpretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{S\}$ velja, da je neto tok, ki priteče v vozlišče $v$, nenegativen, torej da velja $e_f(v) \geq 0$.
+\end{definicija}
+
+\fillblack{0.4}
+\end{frame}
+
+\begin{frame}
+\begin{definicija}
+\textbf{Pretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{s,t\}$ velja, da je neto tok, ki priteče v vozlišče $v$, enak nič, torej da velja $e_f(v) = 0$.
+\end{definicija}
+
+\begin{definicija}
+\textbf{Vrednost pretoka} $f$ je tok, ki vstopa v ponor $t$. Označimo ga z $|f|$. Velja torej $|f| = e_f(t)$.
+\end{definicija}
+
+\begin{definicija}
+\textbf{Maksimalni pretok} je pretok $f$, za katerega velja \[|f| = \max_{f_i} |f_i|.\]
+\end{definicija}
+
+\fillblack{0.4}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
