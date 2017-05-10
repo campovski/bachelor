@@ -111,17 +111,6 @@ Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč pri
 \fillblack{0.33}
 \end{frame}
 
-\begin{frame}
-\begin{izrek}
-\textbf{(maksimalni pretok - minimalni prerez)} Naj bo $G=(V,E,s,t)$ pretočno omrežje in $f$ pretok. Potem sta naslednji trditvi ekvivalentni:
-\begin{enumerate}
-\item Pretok $f$ je maksimalni pretok v $G$.
-\item Residualno omrežje $G_f$ ne vsebuje povečujoče poti.
-\end{enumerate}~
-\end{izrek}
-\fillblack{0.33}
-\end{frame}
-
 \section{Algoritem potisni-povišaj}
 
 \begin{frame}\frametitle{Algoritem potisni-povišaj}
@@ -216,7 +205,17 @@ Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok v $G$ in $h$ višinska f
 \fillblack{0.33}
 \end{frame}
 
-\begin{frame}
+\begin{frame}\setcounter{countIzrek}{0}
+\begin{izrek}
+\textbf{(maksimalni pretok - minimalni prerez)} Naj bo $G=(V,E,s,t)$ pretočno omrežje in $f$ pretok. Potem sta naslednji trditvi ekvivalentni:
+\begin{enumerate}
+\item Pretok $f$ je maksimalni pretok v $G$.
+\item Residualno omrežje $G_f$ ne vsebuje povečujoče poti.
+\end{enumerate}~
+\end{izrek}
+
+\pause
+
 \begin{izrek}
 Naj bo $G=(V,E,s,t)$ pretočno omrežje. Če poženemo algoritem \texttt{POTISNI-POVIŠAJ} na pretočnem omrežju $G$ in se ustavi, potem je predpretok $f$, ki ga algoritem vrne, enak maksimalnemu toku skozi pretočno omrežje $G$.
 \end{izrek}
