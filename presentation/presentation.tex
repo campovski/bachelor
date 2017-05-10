@@ -1,4 +1,4 @@
-\documentclass[t]{beamer}
+\documentclass[t, 10pt]{beamer}
 
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -10,8 +10,14 @@
 \newcounter{countDefinicija}
 \newenvironment{definicija}{\noindent\refstepcounter{countDefinicija}\textbf{Definicija \arabic{countDefinicija} }\itshape}{\\~}
 
-\newcounter{countTrditev}
-\newenvironment{trditev}{\noindent\refstepcounter{countTrditev}\textbf{Trditev \arabic{countTrditev} }\itshape}{\\~}
+\newcounter{countLema}
+\newenvironment{lema}{\noindent\refstepcounter{countLema}\textbf{Lema \arabic{countLema} }\itshape}{\\~}
+
+\newcounter{countIzrek}
+\newenvironment{izrek}{\noindent\refstepcounter{countIzrek}\textbf{Izrek \arabic{countIzrek} }\itshape}{\\~}
+
+\newcounter{countPosledica}
+\newenvironment{posledica}{\noindent\refstepcounter{countPosledica}\textbf{Posledica \arabic{countPosledica} }\itshape}{\\~}
 
 \newcommand{\fillblack}[1]{
 \begin{tikzpicture}[remember picture, overlay]
@@ -60,12 +66,8 @@ Rekli bomo še, da $c(u,v)=0$ natanko tedaj, ko povezava ne obstaja.
 Naj bo $G = (V,E)$ graf in $(G,c)$ omrežje na grafu $G$. \textbf{Pretočno omrežje} na omrežju $(G,c)$ je četverica $(G,c,s,t)$, kjer je $s\in V$ začetno vozlišče pretočnega omrežja, rečemo mu \textbf{izvir}, $t\in V$ pa končno vozlišče pretočnega omrežja, ki mu pravimo \textbf{ponor}.
 \end{definicija}
 
-Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč privzemamo, da imamo neko funkcijo prepustnosti $c$.
+Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč privzemamo, da imamo neko funkcijo prepustnosti $c$.\bigskip
 
-\fillblack{0.4}
-\end{frame}
-
-\begin{frame}
 \begin{definicija}
 \textbf{Psevdopretok} je funkcija $f \colon V \times V \rightarrow \mathbb{R}$, ki zadošča pogojema
 \begin{enumerate}
@@ -73,13 +75,15 @@ Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč pri
 \item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija prepustnosti.
 \end{enumerate}~
 \end{definicija}
-\begin{definicija}
-\textbf{Funkcija presežka} za psevdopretok $f$ je funkcija $e_f \colon V \rightarrow \mathbb{R}$, definirana z $e_f(u) = \sum_{v \in V} f(v,u)$. Če je $e_f(u) > 0$, pravimo, da je $u$ \textbf{v presežku}.
-\end{definicija}
-\fillblack{0.4}
+
+\fillblack{0.33}
 \end{frame}
 
 \begin{frame}
+\begin{definicija}
+\textbf{Funkcija presežka} za psevdopretok $f$ je funkcija $e_f \colon V \rightarrow \mathbb{R}$, definirana z $e_f(u) = \sum_{v \in V} f(v,u)$. Če je $e_f(u) > 0$, pravimo, da je $u$ \textbf{v presežku}.
+\end{definicija}
+
 \begin{definicija}
 \textbf{Residualna prepustnost} povezave glede na trenuten psevdopretok $f$ je funkcija $c_f \colon V \times V \rightarrow \mathbb{R}_+$, definirana kot razlika prepustnosti povezave in trenutnega toka preko nje. Velja torej $c_f(u,v) = c(u,v) - f(u,v)$.
 \end{definicija}
@@ -87,8 +91,7 @@ Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč pri
 \begin{definicija}
 \textbf{Predpretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{S\}$ velja, da je neto tok, ki priteče v vozlišče $v$, nenegativen, torej da velja $e_f(v) \geq 0$.
 \end{definicija}
-
-\fillblack{0.4}
+\fillblack{0.33}
 \end{frame}
 
 \begin{frame}
@@ -104,12 +107,150 @@ Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč pri
 \textbf{Maksimalni pretok} je pretok $f$, za katerega velja \[|f| = \max_{f_i} |f_i|.\]
 \end{definicija}
 
-\fillblack{0.4}
+\fillblack{0.33}
+\end{frame}
+
+\section{Algoritem potisni-povišaj}
+
+\begin{frame}
+Intuicija...
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+POVIŠAJ (u)
+1   // Vozlišče u povišamo, če je e(u) > 0 in
+2   // za vsak v iz V, (u,v) v E_f, velja h(u) <= h(v).
+3   h(u) = min{h(v) : (u,v) v E_f} + 1
+\end{verbatim}
+
+\begin{verbatim}
+POTISNI (u, v)
+1   // Potisnemo lahko, če je e(u) > 0
+2   // c(u,v) > 0 in h(u) = h(v) + 1.
+3   delta = min{ e(u), c(u,v) - f(u,v) }
+4   ČE (u,v) v E, POTEM
+5       f(u,v) += delta
+6   DRUGAČE f(v,u) -= delta
+7   e(u) -= delta
+8   e(v) += delta
+\end{verbatim}
+
+\fillblack{0.30}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+INICIALIZIRAJ_PREDPRETOK(G,s)
+ 1   // V grafu G si izberemo vozlišče s
+ 2   // in inicializiramo predtok.
+ 3   ZA vsak v v V(G)
+ 4       h(v) = 0
+ 5       e(v) = 0
+ 6   ZA vsak (u,v) v E(G)
+ 7       f(u,v) = 0
+ 8   h(s) = |V|
+ 9   ZA vsak v, za katerega obstaja (s,v) v E(G)
+10       f(s,v) = c(s,v)
+11       e(v) = f(s,v)
+\end{verbatim}
+
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{verbatim}
+POTISNI-POVIŠAJ(G,s)
+1   INICIALIZIRAJ_PREDPRETOK(G,s)
+2   DOKLER obstaja mogoča operacija POTISNI ali POVIŠAJ
+3       izvedi mogočo operacijo
+\end{verbatim}
+\fillblack{0.33}
+\end{frame}
+
+\section{Pravilnost delovanja algoritma}
+
+\begin{frame}
+\setcounter{countLema}{0}
+\begin{lema}
+Naj bo $G = (V,E)$ pretočno omrežje, $f\colon V \times V \rightarrow \mathbb{N}_0$ predpretok v $G$ in $h\colon V \rightarrow \mathbb{N}_0$ višinska funkcija. Potem za vsaki vozlišči $u,v \in V$ velja, da če je $h(u) > h(v) + 1$, potem povezava $(u,v)$ ni v residualnem omrežju.
+\end{lema}
+\fillblack{0.33}
+\pause
+
+\begin{lema}\label{lem:potisk_ali_povisanje}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok, $h$ višinska funkcija in $e\colon V \rightarrow \mathbb{N}_0$ funkcija, ki za vsako vozlišče pove, kolikšen je v njem presežek toka. Če ima vozlišče $u\in V$ presežek toka, torej $e(u) > 0$, potem lahko na tem vozlišču opravimo ali operacijo potisni ali operacijo povišaj.
+\end{lema}
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}\setcounter{countLema}{2}
+\begin{lema}\label{lem:visina_ne_pada}
+Med izvajanjem programa \texttt{POTISNI-POVIŠAJ} velja za vsako vozlišče $u \in V$, da se $h(u)$ nikoli ne zmanjša. Še več, vsakič, ko na $u$ opravimo povišanje, se njegova višina poveča za vsaj ena.
+\end{lema}
+\fillblack{0.33}
+\pause
+
+\begin{lema}\label{lem:h_ostane_visinska}
+Med izvajanjem programa \texttt{POTISNI-POVIŠAJ} $h$ vedno zadrži lastnosti višinske funkcije.
+\end{lema}
+\fillblack{0.33}
+\pause
+
+\begin{lema}\label{lem:ni_poti}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok v $G$ in $h$ višinska funkcija na $V$. Potem ne obstaja pot od $s$ do $t$ v residualnem omrežju $G_f$.
+\end{lema}
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}
+\begin{izrek}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje. Če poženemo algoritem \texttt{POTISNI-POVIŠAJ} na pretočnem omrežju $G$ in se ustavi, potem je predpretok $f$, ki ga algoritem vrne, enak maksimalnemu toku skozi pretočno omrežje $G$.
+\end{izrek}
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}\setcounter{countLema}{5}\setcounter{countPosledica}{0}
+\begin{lema}\label{lem:enostavna_pot_s}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje in $f$ predpretok v $G$. Potem za vsako vozlišče $x\in V$, ki je v presežku, obstaja enostavna pot od $x$ do $s$ v residualnem omrežju $G_f$.
+\end{lema}
+\fillblack{0.33}
+\pause
+
+\begin{lema}\label{lem:st_povisanj_vozlisca}
+Naj bo $G = (V,E,s,t)$ pretočno omrežje. Na koncu izvajanja algoritma \texttt{POTISNI-POVISAJ} na $G$, za vsak $u \in V$ velja $h(u) \leq 2|V| - 1$.
+\end{lema}
+\fillblack{0.33}
+\pause
+
+\begin{posledica}\label{pos:om_st_op_povisaj}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POVISAJ} med izvajanjem algoritma \texttt{POTISNI\_POVISAJ} manjše od $2|V|^2$.
+\end{posledica}
+\fillblack{0.33}
+\pause
+
+\begin{lema}\label{lem:om_st_op_potisni_nas}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTISNI}, ki ne zasičijo povezave, med izvajanjem algoritma \texttt{POTISNI\_POVISAJ} manjše od $2|V||E|$.
+\end{lema}
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}\setcounter{countLema}{8}\setcounter{countIzrek}{1}
+\begin{lema} \label{lem:om_st_op_potisni_nezas}
+Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTISNI}, ki ne zasičijo povezave, med izvajanjem algoritma \texttt{POTISNI\_POVISAJ} manjše od $4|V|^2 (|V| + |E|)$.
+\end{lema}
+\fillblack{0.33}
+\pause
+
+\begin{izrek}
+Algoritem \texttt{POTISNI\_POVISAJ} med izvajanjem naredi $\mathcal{O}(V^2E)$ osnovnih operacij.
+\end{izrek}
+\fillblack{0.33}
 \end{frame}
 
 
-
-
+\section{Baseball elimination}
 
 
 

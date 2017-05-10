@@ -8,6 +8,7 @@ bin/
 *.toc
 *.nav
 *.snm
+*.vrb
 
 # Compiled Object files
 *.slo
