@@ -40,7 +40,7 @@
 \title{Algoritem potisni-povišaj za iskanje maksimalnega pretoka}
 \author[Marcel Čampa]{Marcel Čampa\\{\small Mentor: Sergio Cabello}}
 \institute{Fakulteta za matematiko in fiziko}
-\date{\today}
+\date{12. maj 2017}
 
 \maketitle
 
@@ -49,11 +49,11 @@
 
 \begin{frame}\frametitle{Osnovne definicije}
 \begin{definicija}
-\textbf{Graf} $G$ je par množic $G = (V,E)$, kjer je $G$ množica vozlišč grafa, $E$ pa je množica povezav grafa $G$.
+\textbf{(Usmerjen) graf} $G$ je par množic $G = (V,E)$, kjer je $V$ množica vozlišč grafa, $E$ pa je množica povezav grafa $G$.
 \end{definicija}
 
 \begin{definicija}
-Naj bo $G = (V, E)$ graf. \textbf{Omrežje} na grafu $G$ je par $(G, c)$, kjer je $c \colon V \times V \rightarrow \mathbb{R}_+ \cup \{\infty\}$ \textbf{funkcija prepustnosti}, ki vsaki povezavi $(u,v)$ priredi njeno prepustnost $c(u,v)$. Prepustnost $c(u,v) = \infty$ natanko tedaj, ko prepustnost povezave ni omejena.
+Naj bo $G' = (V, E)$ graf. \textbf{Omrežje} $G$ je trojica $G = (V,E, c)$, kjer je $c \colon V \times V \rightarrow \mathbb{R}_+ \cup \{\infty\}$ \textbf{funkcija kapacitivnosti}, ki vsaki povezavi $(u,v)$ priredi njeno kapaciteto $c(u,v)$. Velja $c(u,v) = \infty$ natanko tedaj, ko kapaciteta povezave $(u,v)$ ni omejena.
 \end{definicija}
 
 Rekli bomo še, da $c(u,v)=0$ natanko tedaj, ko povezava ne obstaja.
@@ -64,16 +64,15 @@ Rekli bomo še, da $c(u,v)=0$ natanko tedaj, ko povezava ne obstaja.
 
 \begin{frame}
 \begin{definicija}
-Naj bo $G = (V,E)$ graf in $(G,c)$ omrežje na grafu $G$. \textbf{Pretočno omrežje} na omrežju $(G,c)$ je četverica $(G,c,s,t)$, kjer je $s\in V$ začetno vozlišče pretočnega omrežja, rečemo mu \textbf{izvir}, $t\in V$ pa končno vozlišče pretočnega omrežja, ki mu pravimo \textbf{ponor}.
+Naj bo $G = (V,E,c)$ omrežje. \textbf{Pretočno omrežje} na omrežju $G$ je peterica $(V,E,c,s,t)$, kjer je $s\in V$ začetno vozlišče pretočnega omrežja, rečemo mu \textbf{izvir}, $t\in V$ pa končno vozlišče pretočnega omrežja, ki mu pravimo \textbf{ponor}.
 \end{definicija}
 
-Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč privzemamo, da imamo neko funkcijo prepustnosti $c$.\bigskip
 
 \begin{definicija}
 \textbf{Psevdopretok} je funkcija $f \colon V \times V \rightarrow \mathbb{R}$, ki zadošča pogojema
 \begin{enumerate}
 \item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) = - f(v,u)$.
-\item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija prepustnosti.
+\item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija kapacitivnosti.
 \end{enumerate}~
 \end{definicija}
 
@@ -86,11 +85,7 @@ Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč pri
 \end{definicija}
 
 \begin{definicija}
-\textbf{Residualna prepustnost} povezave glede na trenuten psevdopretok $f$ je funkcija $c_f \colon V \times V \rightarrow \mathbb{R}_+$, definirana kot razlika prepustnosti povezave in trenutnega toka preko nje. Velja torej $c_f(u,v) = c(u,v) - f(u,v)$.
-\end{definicija}
-
-\begin{definicija}
-\textbf{Predpretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{S\}$ velja, da je neto tok, ki priteče v vozlišče $v$, nenegativen, torej da velja $e_f(v) \geq 0$.
+\textbf{Predpretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{s\}$ velja, da je neto tok, ki priteče v vozlišče $v$, nenegativen, torej da velja $e_f(v) \geq 0$.
 \end{definicija}
 \fillblack{0.33}
 \end{frame}
@@ -101,7 +96,7 @@ Ponavadi pišemo pretočno omrežje kar kot $G = (V,E,s,t)$. Pri tem namreč pri
 \end{definicija}
 
 \begin{definicija}
-\textbf{Vrednost pretoka} $f$ je tok, ki vstopa v ponor $t$. Označimo ga z $|f|$. Velja torej $|f| = e_f(t)$.
+\textbf{Vrednost pretoka} $f$ označimo z $|f|$ in je definiran kot $|f| = e_f(t)$.
 \end{definicija}
 
 \begin{definicija}
@@ -131,11 +126,10 @@ POTISNI (u, v)
 1   // Potisnemo lahko, če je e(u) > 0
 2   // c(u,v) > 0 in h(u) = h(v) + 1.
 3   delta = min{ e(u), c(u,v) - f(u,v) }
-4   ČE (u,v) v E, POTEM
-5       f(u,v) += delta
-6   DRUGAČE f(v,u) -= delta
-7   e(u) -= delta
-8   e(v) += delta
+4   f(u,v) += delta
+5   f(v,u) -= delta
+6   e(u) -= delta
+7   e(v) += delta
 \end{verbatim}
 
 \fillblack{0.30}
@@ -165,33 +159,21 @@ INICIALIZIRAJ_PREDPRETOK(G,s)
 POTISNI-POVIŠAJ(G,s)
 1   INICIALIZIRAJ_PREDPRETOK(G,s)
 2   DOKLER obstaja mogoča operacija POTISNI ali POVIŠAJ
-3       izvedi mogočo operacijo
+3       ČE lahko izvedeš POTISNI, POTEM
+4           POTISNI
+5       DRUGAČE POVIŠAJ
 \end{verbatim}
 \fillblack{0.33}
 \end{frame}
 
 \section{Pravilnost delovanja algoritma}
 
-\begin{frame}\frametitle{Pravilnost delovanja algoritma in časovna zahtevnost}
-\setcounter{countLema}{0}
-\begin{lema}
-Naj bo $G = (V,E)$ pretočno omrežje, $f\colon V \times V \rightarrow \mathbb{N}_0$ predpretok v $G$ in $h\colon V \rightarrow \mathbb{N}_0$ višinska funkcija. Potem za vsaki vozlišči $u,v \in V$ velja, da če je $h(u) > h(v) + 1$, potem povezava $(u,v)$ ni v residualnem omrežju.
-\end{lema}
-\fillblack{0.33}
-\pause
+\begin{frame}\setcounter{countLema}{0}\frametitle{Pravilnost delovanja algoritma in časovna zahtevnost}
 
 \begin{lema}\label{lem:potisk_ali_povisanje}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok, $h$ višinska funkcija in $e\colon V \rightarrow \mathbb{N}_0$ funkcija, ki za vsako vozlišče pove, kolikšen je v njem presežek toka. Če ima vozlišče $u\in V$ presežek toka, torej $e(u) > 0$, potem lahko na tem vozlišču opravimo ali operacijo potisni ali operacijo povišaj.
+Naj bo $G=(V,E,c,s,t)$ pretočno omrežje, $f$ predpretok, $h$ višinska funkcija in $e_f\colon V \rightarrow \mathbb{N}_0$ funkcija presežka. Če ima vozlišče $u\in V$ presežek toka, torej $e_f(u) > 0$, potem lahko na tem vozlišču opravimo ali operacijo potisni ali operacijo povišaj.
 \end{lema}
-\fillblack{0.33}
-\end{frame}
-
-\begin{frame}\setcounter{countLema}{2}
-\begin{lema}\label{lem:visina_ne_pada}
-Med izvajanjem programa \texttt{POTISNI-POVIŠAJ} velja za vsako vozlišče $u \in V$, da se $h(u)$ nikoli ne zmanjša. Še več, vsakič, ko na $u$ opravimo povišanje, se njegova višina poveča za vsaj ena.
-\end{lema}
-\fillblack{0.33}
-\pause
+\fillblack{0.33}\pause
 
 \begin{lema}\label{lem:h_ostane_visinska}
 Med izvajanjem programa \texttt{POTISNI-POVIŠAJ} $h$ vedno zadrži lastnosti višinske funkcije.
@@ -200,62 +182,58 @@ Med izvajanjem programa \texttt{POTISNI-POVIŠAJ} $h$ vedno zadrži lastnosti vi
 \pause
 
 \begin{lema}\label{lem:ni_poti}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok v $G$ in $h$ višinska funkcija na $V$. Potem ne obstaja pot od $s$ do $t$ v residualnem omrežju $G_f$.
+Naj bo $G=(V,E,c,s,t)$ pretočno omrežje, $f$ predpretok v $G$ in $h$ višinska funkcija na $V$. Potem ne obstaja pot od $s$ do $t$ v residualnem omrežju $G_f$.
 \end{lema}
 \fillblack{0.33}
 \end{frame}
 
 \begin{frame}\setcounter{countIzrek}{0}
 \begin{izrek}
-\textbf{(maksimalni pretok - minimalni prerez)} Naj bo $G=(V,E,s,t)$ pretočno omrežje in $f$ pretok. Potem sta naslednji trditvi ekvivalentni:
+\textbf{(maksimalni pretok - minimalni prerez)} Naj bo $G=(V,E,c,s,t)$ pretočno omrežje in $f$ pretok. Potem sta naslednji trditvi ekvivalentni:
 \begin{enumerate}
 \item Pretok $f$ je maksimalni pretok v $G$.
 \item Residualno omrežje $G_f$ ne vsebuje povečujoče poti.
 \end{enumerate}~
 \end{izrek}
 
+\fillblack{0.33}
 \pause
 
 \begin{izrek}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje. Če poženemo algoritem \texttt{POTISNI-POVIŠAJ} na pretočnem omrežju $G$ in se ustavi, potem je predpretok $f$, ki ga algoritem vrne, enak maksimalnemu toku skozi pretočno omrežje $G$.
+Naj bo $G=(V,E,c,s,t)$ pretočno omrežje. Če poženemo algoritem \texttt{POTISNI-POVIŠAJ} na pretočnem omrežju $G$ in se ustavi, potem je predpretok $f$, ki ga algoritem vrne, enak maksimalnemu toku skozi pretočno omrežje $G$.
 \end{izrek}
 \fillblack{0.33}
 \end{frame}
 
-\begin{frame}\setcounter{countLema}{5}\setcounter{countPosledica}{0}
-\begin{lema}\label{lem:enostavna_pot_s}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje in $f$ predpretok v $G$. Potem za vsako vozlišče $x\in V$, ki je v presežku, obstaja enostavna pot od $x$ do $s$ v residualnem omrežju $G_f$.
-\end{lema}
-\fillblack{0.33}
-\pause
+\begin{frame}\setcounter{countLema}{3}\setcounter{countPosledica}{0}
 
 \begin{lema}\label{lem:st_povisanj_vozlisca}
-Naj bo $G = (V,E,s,t)$ pretočno omrežje. Na koncu izvajanja algoritma \texttt{POTISNI-POVISAJ} na $G$, za vsak $u \in V$ velja $h(u) \leq 2|V| - 1$.
+Naj bo $G = (V,E,c,s,t)$ pretočno omrežje. Na koncu izvajanja algoritma \texttt{POTISNI-POVIŠAJ} na $G$, za vsak $u \in V$ velja $h(u) \leq 2|V| - 1$.
 \end{lema}
 \fillblack{0.33}
 \pause
 
 \begin{posledica}\label{pos:om_st_op_povisaj}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POVISAJ} med izvajanjem algoritma \texttt{POTISNI\_POVISAJ} manjše od $2|V|^2$.
+Naj bo $G=(V,E,c,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POVIŠAJ} med izvajanjem algoritma \texttt{POTISNI-POVIŠAJ} manjše od $2|V|^2$.
 \end{posledica}
 \fillblack{0.33}
 \pause
 
 \begin{lema}\label{lem:om_st_op_potisni_nas}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTISNI}, ki ne zasičijo povezave, med izvajanjem algoritma \texttt{POTISNI\_POVISAJ} manjše od $2|V||E|$.
-\end{lema}
-\fillblack{0.33}
-\end{frame}
-
-\begin{frame}\setcounter{countLema}{8}\setcounter{countIzrek}{1}
-\begin{lema} \label{lem:om_st_op_potisni_nezas}
-Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTISNI}, ki ne zasičijo povezave, med izvajanjem algoritma \texttt{POTISNI\_POVISAJ} manjše od $4|V|^2 (|V| + |E|)$.
+Naj bo $G=(V,E,c,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTISNI}, ki ne zasičijo povezave, med izvajanjem algoritma \texttt{POTISNI-POVIŠAJ} manjše od $2|V||E|$.
 \end{lema}
 \fillblack{0.33}
 \pause
 
+\begin{lema} \label{lem:om_st_op_potisni_nezas}
+Naj bo $G=(V,E,c,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTISNI}, ki ne zasičijo povezave, med izvajanjem algoritma \texttt{POTISNI-POVIŠAJ} manjše od $4|V|^2 (|V| + |E|)$.
+\end{lema}
+\fillblack{0.33}
+\end{frame}
+
+\begin{frame}
 \begin{izrek}
-Algoritem \texttt{POTISNI\_POVISAJ} med izvajanjem naredi $\mathcal{O}(V^2E)$ osnovnih operacij.
+Algoritem \texttt{POTISNI-POVIŠAJ} med izvajanjem naredi $\mathcal{O}(V^2E)$ osnovnih operacij.
 \end{izrek}
 \fillblack{0.33}
 \end{frame}
