@@ -7,6 +7,7 @@
 
 % aktivirajte pakete, ki jih potrebujete
 % \usepackage{tikz}
+\usepackage{hhline}
 
 % za številske množice uporabite naslednje simbole
 \newcommand{\R}{\mathbb R}
@@ -514,7 +515,7 @@ void napolni_graf()
 \end{verbatim}~
 
 
-Opazimo dve naslednji dve stvari. Najpomembnejša stvar, ki jo opazimo je, da smo v metodi \texttt{makimalni\_pretok} zahtevali, da se program izvaja dokler obstaja vozlišče s presežkom. Spomnimo se, da smo v psevdokodi namreč zapisali, da se mora program izvajati dokler obstaja mogoča operacija potiska ali povišanja. Da sta stvari ekvivalentni, si bomo pogledali v dokazu pravilnosti algoritma (lema \ref{lem:potisk_ali_povisanje}).
+Opazimo naslednjo stvar. V funkciji \texttt{potisni\_povisaj} smo zahtevali, da se program izvaja dokler obstaja vozlišče s presežkom. Spomnimo se, da smo v psevdokodi namreč zapisali, da se mora program izvajati dokler obstaja mogoča operacija potiska ali povišanja. Da sta stvari ekvivalentni, si bomo pogledali v dokazu pravilnosti algoritma (lema \ref{lem:potisk_ali_povisanje}).
 
 
 
@@ -692,6 +693,47 @@ Algoritem \texttt{POTISNI\_POVISAJ} med izvajanjem naredi $\mathcal{O}(V^2E)$ os
 \begin{dokaz}
 Sledi neposredno iz posledice \ref{pos:om_st_op_povisaj} ter lem \ref{lem:om_st_op_potisni_nas} in \ref{lem:om_st_op_potisni_nezas}.
 \end{dokaz}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Eliminacija ekip v baseballu}
+
+V tem razdelku si bomo pogledali primer, kako nam iskanje maksimalnih pretokov pride prav v vsakdanjem življenju. Ogledali si bomo, kako lahko modeliramo pretočno omrežje, s katerim lahko določimo, ali ima ekipa v prvenstvu še možnosti za končno zmago ali izenačenje na prvem mestu.\\
+
+Recimo, da imamo ekipe $i \in \mathcal{T} = \{ 1, 2, 3, \dotsc, n\}$, za nek $n \in \N$. Ekipa $i$ ima v nekem določenem trenutku tekom prvenstva $w_i$ zmag, do konca pa mora odigrati še $r_i$ iger. Definirajmo še $r_{ij}$ kot število iger, ki jih še mora odigrati ekipa $i$ proti ekipi $j$. Očitno velja \[r_i = \sum_{j \in \mathcal{T}\setminus\{i\}} r_{ij}.\]
+
+Od sedaj naprej se bomo osredotočili na ekipo $x$. Poglejmo si sedaj, kako bi lahko hitro sklepali napačno. Naj bo $q$ število zmag, ki jih ima v tem trenutku vodilna ekipa. Tako bi lahko naivno sklepali, da ima naša ekipa še možnosti za zmago, če velja $w_x + r_x \geq q$. Pojasnimo, zakaj je to sklepanje napačno. Recimo, kar bomo od sedaj naprej vedno predpostavljali, da ekipa $x$ zmaga vse igre do konca prvenstva. Potem bo imela $w_x + r_x$ zmag. Recimo, da vodilna ekipa, ki ima sedaj $q$ zmag, do konca prvenstva vse igre izgubi. Naj velja $w_x + r_x \geq q$. Vendar, ker je vodilna ekipa vse igre izgubila, se lahko zgodi, da je katera izmed ostalih ekip tako morala nabrati več kot $w_x + r_x$. Oglejmo si naslednjo tabelo.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{||c||c|c||c|c|c||}
+\hhline{|t:======:t|}
+ekipa & $w_i$ & $r_i$ & $r_{i1}$ & $r_{i2}$ & $r_{i3}$\\ \hhline{||=||==||===||}
+$1$ & $70$ & $6$ & & $3$ & $3$\\ \hhline{||-||--||---||}
+$2$ & $68$ & $5$ & $3$ & & $2$\\ \hhline{||-||--||---||}
+$x$ & $65$ & $5$ & $3$ & $2$ & \\ \hhline{|b:======:b|}
+\end{tabular}
+\end{table}
+
+Recimo, da sedaj naša ekipa $x$ zmaga vse igre. Potem ima na koncu $w_x + r_x = 65+5=70 \geq 70 = q$ točk. Vendar morata med seboj igre odigrati tudi ekipa $1$ in $2$. Ekipa $1$ ne sme zmagati nobene igre, drugače je pred našo ekipo $x$. Torej mora proti ekipi $2$ izgubiti čisto vse $3$ igre, kar pomeni, da bo ekipa $2$ na koncu imela $68+3 = 71 > 70$ zmag. To pomeni, da kljub temu, da je $w_x + r_x \geq q$, ekipa $x$ nima več možnosti za zmago, torej je eliminirana.
+
+Sedaj, ko smo se prepričali, da problem ni čisto trivialen, se lotimo nazaj k splošnemu primeru, kjer imamo $n$ ekip. Recimo, da nas zanima, ali ima ekipa $n$ še možnosti za zmago. Modelirajmo naslednje pretočno omrežje:
+\begin{align*}
+V &= s \cup \binom{\mathcal{T} \setminus \{n\}}{2} \cup \mathcal{T} \setminus \{n\} \cup t\\
+E &= \left\{(s,(i,j)) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2}\right\} \cup\\
+&~~~~~\cup \left\{((i,j), \alpha) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2} \wedge \alpha \in \{i,j\}\right\} \cup\\
+&~~~~~\cup \left\{(\alpha, t) : \alpha \in \mathcal{T} \setminus \{n\}\right\}\\
+c(e) &=\begin{cases}
+r_{ij} &;~~~ e \in \left\{(s,(i,j)) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2}\right\}\\
+\infty &;~~~ e \in \left\{((i,j), \alpha) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2} \wedge \alpha \in \{i,j\}\right\}\\
+w_{\alpha} - (w_n + r_n) &;~~~ e \in \left\{(\alpha, t) : \alpha \in \mathcal{T} \setminus \{n\}\right\}
+\end{cases}\\
+s &= \{\textrm{število tekem, ki jih morajo odigrati ekipe $1,2,\dotsc,n-1$}\}\\
+t &= \{\textrm{število točk, ki jih bodo na koncu imele ekipe $1,2,\dotsc, n-1$}\}
+\end{align*}
+
+To izgleda izjemno grdo in nepregledno, zato si poglejmo še shemo pretočnega omrežja.
 
 
 
