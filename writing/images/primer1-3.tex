@@ -30,16 +30,16 @@
         \node[state] (t) [above right of=t4] {$t$};
 
 
-        \path[->, color=red] (s) edge node {$100$} (s1);
+        \path[->] (s) edge node {$90/100$} (s1);
         \path[->,color=red] (s) edge node[below left] {$50$} (s2);
         \path[->, color=red] (s1) edge node[above left] {$50$} (t1);
-        \path[->] (s1) edge node[below right] {$~50/60$} (t2);
+        \path[->] (s1) edge node[below right] {$~40/60$} (t2);
         \path[->] (s2) edge node[left] {$10/20$} (t3);
         \path[->] (s2) edge node[right] {$~~40/60$} (t4);
         \path[->] (t2) edge node[right] {$0/30$} (t3);
         \path[->] (t1) edge node {$5/10$} (t3);
         \path[->, color=red] (t1) edge node[right] {$45$} (t);
-        \path[->, color=red] (t2) edge node[above] {$50$} (t);
+        \path[->, color=red] (t2) edge node[above] {$40$} (t);
         \path[->, color=red] (t3) edge node {$15$} (t);
         \path[->, color=red] (t4) edge node[below] {$40$} (t);
 
