@@ -1,0 +1,51 @@
+\documentclass{standalone}
+\usepackage{pgf, tikz}
+\usepackage{mathtools}
+\usetikzlibrary{arrows, automata}
+
+\begin{document}
+
+    \begin{tikzpicture}[
+            > = stealth, % arrow head style
+            shorten > = 1pt, % don't touch arrow head to node set to +pt
+            auto,
+            node distance = 2cm, % distance between nodes
+            semithick % line style
+        ]
+
+        \tikzstyle{every state}=[
+            draw = black,
+            thick,
+            fill = white,
+            minimum size = 2mm
+        ]
+
+        \node[state] (s) {$s$};
+        \node[state] (s1) [above right of=s] {$s_1$};
+        \node[state] (s2) [below of=s1] {$s_2$};
+        \node[state] (t1) [above right of=s1] {$t_1$};
+        \node[state] (t2) [below right of=s2] {$t_2$};
+        \node[state] (t3) [right of=t1] {$t_3$};
+        \node[state] (t4) [right of=t2] {$t_4$};
+        \node[state] (t5) [above right of=s2] {$t_5$};
+        \node[state] (t) [above right of=t4] {$t$};
+
+
+        \path[->] (s) edge (s1);
+        \path[->] (s) edge (s2);
+        \path[->] (s1) edge (t1);
+        \path[->] (s1) edge (t2);
+        \path[->] (s2) edge (t5);
+        \path[->] (t5) edge (t3);
+        \path[->] (t5) edge (t4);
+        \path[->] (t2) edge (t3);
+        \path[->] (t1) edge (t3);
+        \path[->] (t1) edge (t);
+        \path[->] (t2) edge (t);
+        \path[->] (t3) edge (t);
+        \path[->] (t5) edge node {$0$} (t);
+        \path[->] (t4) edge (t);
+
+    \end{tikzpicture}
+
+\end{document}
