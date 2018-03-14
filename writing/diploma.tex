@@ -68,7 +68,19 @@
 
 \section{Uvod}
 
-%TODO
+Tema mojega diplomskega dela je algoritem potisni-povišaj, s katerim iščemo maksimalen pretok v danem pretočnem omrežju. V angleščini rečemo temu algoritmu \textit{push-relabel algorithm}, zato se marsikomu morda porodi vprašanje,
+zakaj prevod \textit{relabel} v \textit{povišaj}. Za ta prevod sem se odločil zato, ker takrat, ko opravimo tako imenovano operacijo \textit{relabel}, vozlišče postavimo na večjo višino.
+
+Cilj tega dela je spoznati se z osnovnimi koncepti teorije grafov in kombinatorične optimizacije, predvsem pa se od bližje spoznati z enim od učinkovitejših algorimov za iskanje maksimalnega pretoka. Poleg našega algoritma
+sodijo med bolj znane še algoritem Forda in Fulkersona, Edmonds-Karpov algoritem, Dinicev algoritem, KRT (King, Rao, Tarjan) in KRT+O (KRT + Orlin). Prva dva algoritma imata slabšo časovno zahtevnost od algoritma potisni-povišaj,
+Dinicev ima enako kot osnovna verzija potisni-povišaj, zadnja dva pa sta hitrejša.
+
+Ko sem se udomačil v teoriji algoritma, sem se lotil implementacije v programskem jeziku C++, ki sem ga izbral povsem arbitrarno. Največjo vlogo pri izbiri sta sicer igrali hitrost in praktičnost, vendar sem se za C++ odločil, ker v njem
+že dolgo časa nisem napisal ničesar. Med pisanjem algoritma sem pravzaprav čisto sam ,,odkril'' izboljšavo algoritma, ki izboljša časovno zahtevnost navadnega potisni-povišaj z $\mathcal{O}(V^2E)$ na $\mathcal{O}(V^3)$, kjer je $V$ število vozlišč
+v omrežju, $E$ pa število povezav.
+
+Sedaj, ko je bil algoritem implementiran in stestiran, sem kolebal med tem, ali naj algoritem poženem na primerih različne velikosti in ugotovitve vključim v to delo, ali pa naj raje predstavim, kako nam lahko maksimalni pretoki pomagajo
+v vsakdanjem življenju. Vsekakor se mi je zdela bolj poučna slednja stvar, zato sem se zanjo tudi odločil. Navsezadnje je tudi zanimivejša kakor suhoparno nabijanje številk v tabelo, ki je sama sebi namen.
 
 \section{Osnovne definicije}
 
@@ -99,6 +111,15 @@ Naj bo $G = (V,E)$ graf in $(G,c)$ omrežje na grafu $G$. \textbf{Pretočno omre
 \begin{definicija}
 \textbf{Residualna prepustnost} povezave glede na trenuten psevdopretok $f$ je funkcija $c_f \colon V \times V \rightarrow \mathbb{R}_+$, definirana kot razlika prepustnosti povezave in trenutnega toka preko nje. Velja torej $c_f(u,v) = c(u,v) - f(u,v)$.
 \end{definicija}
+
+\begin{definicija}
+  Naj bo $G = (V,E)$ pretočno omrežje in $f$ tok v tem omrežju. \textbf{Residualno omrežje} omrežja $(G,c,s,t)$, inducirano s tokom $f$ je $G_f = (V,E_f)$, kjer je \[ E_f = \{ (u,v) \in V \times V \mid |c_f(u,v)| > 0 \}. \]
+\end{definicija}
+
+\begin{opomba}
+  Opazimo dve stvari. O grafu $G$ smo govorili kot o pretočnem omrežju. To storimo takrat, ko nas $c$, $s$ in $t$ ne zanimajo, ali pa je iz konteksta razvidno, kaj so. Druga stvar pa je, da smo uporabili besedo \textit{tok}, brez predhodne definicije le-tega.
+  Za sedaj si lahko mislimo, da je to psevdopretok, kar je povsem smiselno v kontekstu algoritma potisni-povišaj.
+\end{opomba}
 
 \begin{definicija}
 \textbf{Funkcija presežka} za psevdopretok $f$ je funkcija $e_f \colon V \rightarrow \mathbb{R}$, definirana z $e_f(u) = \sum_{v \in V} f(v,u) - \sum_{v \in V} f(u,v)$. Če je $e_f(u) > 0$, pravimo, da je $u$ \textbf{v presežku}.
@@ -741,6 +762,18 @@ Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok v $G$ in $h$ višinska f
 Pokažimo s pomočjo protislovja. Recimo torej, da v $G_f$ obstaja pot $p$ od $s$ do $t$, kjer je $p = \langle v_0 = s, v_1, v_2, \dotsc v_{n-1}, v_n = t\rangle$. Brez škode za splošnost lahko predpostavimo, da je $p$ enostavna pot, torej pot brez ciklov. Potem velja $n < |V|$. Ker je $p$ pot v residualnem omrežju $G_f$, za vsak $i = 0, 1, \dotsc, n-1$ velja, da je $(v_i, v_{i+1}) \in E_f$. Ker pa je $h$ višinska funkcija, za vsak $i = 0, 1, \dotsc, n-1$ velja $h(v_i) \leq h(v_{i+1}) + 1$. Od tod sledi, da velja $h(s) \leq h(t) + n$. Ampak, ker je po definiciji višinske funkcije $h(t) = 0$, dobimo $h(s) \leq n < |V|$, kar pa je v protislovju s tem, da je $h$ višinska funkcija. Veljati bi namreč moralo $h(s) = |V|$. Zaključimo, da v residualnem omrežju $G_f$ torej ne obstaja pot med $s$ in $t$.
 \end{dokaz}
 
+Manjka nam še klasični izrek iskanja maksimalnih pretokov, ki mu v angleščini pravimo \textit{max-flow min-cut theorem}. Nismo se sicer spoznali s pojmom \textit{prerez omrežja}, vendar bomo izrek vseeno navedli v celoti, saj se to edino spodobi. Dokaz izreka bomo spustili, saj je preobširen in zahteva
+določena znanja, ki za algoritme tipa potisni-povišaj nimajo vrednosti.
+
+\begin{izrek}[izrek max-pretok min-prerez] \label{izr:maxflowmincut}
+  Naj bo $G = (V,E)$ in $f$ pretok v omrežju $(G, c, s, t)$. Naslednje trditve so ekvivalentne.
+  \begin{enumerate}
+    \item $f$ je maksimalni pretok v $G$.
+    \item Residualno omrežje $G_f$ ne vsebuje nobene povečujoče poti.
+    \item $|f| = c(S, T)$ za nek prerez $(S,T)$ omrežja $G$.
+  \end{enumerate}
+\end{izrek}
+
 Sedaj smo pridobili vso potrebno znanje, da dokažemo, da ČE se algoritem \texttt{POTISNI-POVIŠAJ} zaključi, je potem predpretok, ki ga algoritem vrne, enak maksimalnemu pretoku skozi omrežje.
 
 \begin{izrek}
@@ -761,7 +794,7 @@ Ker smo v vrstici 3 operacije \texttt{POTISNI} vzeli $\delta = \min\{e(u), c(u,v
 
 Podobno premislimo, da se ohrani lastnost (2). Če v vrstici 3 operacije \texttt{POTISNI} vzamemo $\delta = e(u)$, bomo potem v vrstici 7 zmanjšali presežek v vozlišču $u$ na nič, torej bo veljalo $e(u) = 0$. Če pa bomo vzeli $\delta = c(u,v) - f(u,v) < e(u)$, bo po opravljeni operaciji veljalo $\tilde{e}(u) = e(u) - \big(c(u,v) - f(u,v)\big) > 0$, kjer je $\tilde{e}(u)$ presežek po opravljeni operaciji. Ker $e(v)$ prištejemo pozitivno vrednost, bo po opravljeni operaciji še vedno veljalo $e(v) > 0$.\\
 
-Ob zaključku izvajanja algoritma velja $e(u) = 0$ za vsak $u \in V\setminus \{s,t\}$. Namreč iz leme \ref{lem:potisk_ali_povisanje} in dejstva, da je $f$ po vsaki operaciji še vedno predpretok, sledi, da po zaključku ne morejo obstajati vozlišča s presežki ($s$ in $t$ namreč nikoli nista v presežku). To pomeni, da je predpretok $f$ pravzaprav tok. Lema \ref{lem:h_ostane_visinska} nam pove, da je ob zaključku algoritma $h$ še vedno višinska funkcija, od koder po lemi \ref{lem:ni_poti} sledi, da ob zaključku algoritma ni poti med $s$ in $t$ v residualnem omrežju $G_f$. Po izreku (REFERENCA NA MAX-FLOW MIN-CUT, KI GA JE POTREBNO VKLJUČITI) (izrek o maksimalnem pretoku in minimalnem prerezu) je tako $f$ maksimalni pretok.
+Ob zaključku izvajanja algoritma velja $e(u) = 0$ za vsak $u \in V\setminus \{s,t\}$. Namreč iz leme \ref{lem:potisk_ali_povisanje} in dejstva, da je $f$ po vsaki operaciji še vedno predpretok, sledi, da po zaključku ne morejo obstajati vozlišča s presežki ($s$ in $t$ namreč nikoli nista v presežku). To pomeni, da je predpretok $f$ pravzaprav tok. Lema \ref{lem:h_ostane_visinska} nam pove, da je ob zaključku algoritma $h$ še vedno višinska funkcija, od koder po lemi \ref{lem:ni_poti} sledi, da ob zaključku algoritma ni poti med $s$ in $t$ v residualnem omrežju $G_f$. Po izreku \ref{izr:maxflowmincut} (izrek o maksimalnem pretoku in minimalnem prerezu) je tako $f$ maksimalni pretok.
 \end{dokaz}
 
 S tem smo pokazali, da če se algoritem konča, dobimo pravilen rezultat. Ostane nam pokazati še, da se algoritem sploh konča. To bomo naredili v naslednjem podrazdelku, v katerem se bomo ukvarjali s časovno zahtevnostjo. Omejili bomo število operacij, ki se lahko zgodijo, in s tem pokazali, da se algoritem res konča.\\
@@ -822,7 +855,7 @@ Naj bo $G=(V,E,s,t)$ pretočno omrežje. Potem je število operacij \texttt{POTI
 \begin{dokaz}
 Za vsak par vozlišč $u,v \in V$ bomo prešteli, koliko potiskov, ki zasičijo povezavo, je iz $u$ v $v$ in obratno. Če kakšen tak potisk obstaja, je vsaj ena od povezav $(u,v)$ in $(v,u)$ v $E$.
 
-Recimo, da se je zgodil potisk iz $u$ v $v$. Na tej točki je veljalo $h(v) = h(u) - 1$. Če želimo še kdaj potisniti iz $u$ v $v$, moramo najprej potisniti iz $v$ v $u$ nekaj toka, saj je povezava sedaj zasičena, in veljati mora $u(v) = u(h) + 1$. Ker $h(u)$ ne pada, se mora $u(v)$ povečati za vsaj $2$. Podobno premislimo, da se mora $h(u)$ povečati vsaj za $2$ med potiski iz $v$ v $u$, ki zasičijo povezavo. Spet uporabimo lemo \ref{lem:st_povisanj_vozlisca}, ki nam pove, da so višine vozlišč ves čas med $0$ in $2|V|-1$. Iz tega sledi, da se lahko $h(u)$ poveča za $2$ manj kot $|V|$-krat med delovanjem algoritma. Ker se mora med dvema potiskoma, ki zasičita povezavo, vsaj enkrat eden od $h(u)$ in $h(v)$ povečati za $2$, je tako možnih največ $2|V|$ potiskov med $u$ in $v$, ki zasičijo povezavo (lahko jih je tudi manj, če se $h(u)$ oziroma $h(v)$ povečata večkrat). Ker je povezav $|E|$, tako dobimo, da je potiskov, ki zasičijo povezavo, največ $2|V||E|$.
+Recimo, da se je zgodil potisk iz $u$ v $v$. Na tej točki je veljalo $h(v) = h(u) - 1$. Če želimo še kdaj potisniti iz $u$ v $v$, moramo najprej potisniti iz $v$ v $u$ nekaj toka, saj je povezava sedaj zasičena, in veljati mora $h(v) = h(u) + 1$. Ker $h(u)$ ne pada, se mora $h(v)$ povečati za vsaj $2$. Podobno premislimo, da se mora $h(u)$ povečati vsaj za $2$ med potiski iz $v$ v $u$, ki zasičijo povezavo. Spet uporabimo lemo \ref{lem:st_povisanj_vozlisca}, ki nam pove, da so višine vozlišč ves čas med $0$ in $2|V|-1$. Iz tega sledi, da se lahko $h(u)$ poveča za $2$ manj kot $|V|$-krat med delovanjem algoritma. Ker se mora med dvema potiskoma, ki zasičita povezavo, vsaj enkrat eden od $h(u)$ in $h(v)$ povečati za $2$, je tako možnih največ $2|V|$ potiskov med $u$ in $v$, ki zasičijo povezavo (lahko jih je tudi manj, če se $h(u)$ oziroma $h(v)$ povečata večkrat). Ker je povezav $|E|$, tako dobimo, da je potiskov, ki zasičijo povezavo, največ $2|V||E|$.
 \end{dokaz}
 
 \begin{lema}[omejenost števila operacij \texttt{POTISNI}, ki ne zasičijo povezave] \label{lem:om_st_op_potisni_nezas}
@@ -887,7 +920,7 @@ Hitro ugotovimo, da gre za problem, pri katerem imamo več izvorov in več ponor
 ponorom, si oglejmo naslednjo lemo.
 
 \begin{lema}
-  Pretočno omrežje $(G = (V,E), c, \mathcal{S}, \mathcal{T})$ z množico izvirov $\mathcal{S} = \{s_1, s_2, \dotsc, s_m\}$ in množico ponorov $\mathcal{T} = \{t_1, t_2, \dotsc, t_n\}$
+  Pretočno omrežje $(G, c, \mathcal{S}, \mathcal{T})$, kjer je $G = (V,E)$, $\mathcal{S} = \{s_1, s_2, \dotsc, s_m\}$ množica izvirov in $\mathcal{T} = \{t_1, t_2, \dotsc, t_n\}$ množica ponorov,
   je ekvivalentno pretočnemu omrežju $(G', c', s, t)$, ki ga dobimo na naslednji način:
   \begin{align*}
     G' &= (V', E'),\\
@@ -960,20 +993,48 @@ Recimo, da sedaj naša ekipa $x$ zmaga vse igre. Potem ima na koncu $w_x + r_x =
 
 Sedaj, ko smo se prepričali, da problem ni čisto trivialen, se vrnimo nazaj k splošnemu primeru, kjer imamo $n$ ekip. Recimo, da nas zanima, ali ima ekipa $n$ še možnosti za zmago. Modelirajmo naslednje pretočno omrežje:
 \begin{align*}
-V &= s \cup \binom{\mathcal{T} \setminus \{n\}}{2} \cup \mathcal{T} \setminus \{n\} \cup t\\
+V &= s \cup \binom{\mathcal{T} \setminus \{n\}}{2} \cup \mathcal{T} \setminus \{n\} \cup t,\\
 E &= \left\{(s,(i,j)) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2}\right\} \cup\\
 &~~~~~\cup \left\{((i,j), \alpha) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2} \wedge \alpha \in \{i,j\}\right\} \cup\\
-&~~~~~\cup \left\{(\alpha, t) : \alpha \in \mathcal{T} \setminus \{n\}\right\}\\
+&~~~~~\cup \left\{(\alpha, t) : \alpha \in \mathcal{T} \setminus \{n\}\right\},\\
 c(e) &=\begin{cases}
 r_{ij} &;~~~ e \in \left\{(s,(i,j)) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2}\right\}\\
 \infty &;~~~ e \in \left\{((i,j), \alpha) : (i,j) \in \binom{\mathcal{T} \setminus \{n\}}{2} \wedge \alpha \in \{i,j\}\right\}\\
-w_{\alpha} - (w_n + r_n) &;~~~ e \in \left\{(\alpha, t) : \alpha \in \mathcal{T} \setminus \{n\}\right\}
-\end{cases}\\
-s &= \{\textrm{število tekem, ki jih morajo odigrati ekipe $1,2,\dotsc,n-1$}\}\\
-t &= \{\textrm{število točk, ki jih bodo na koncu imele ekipe $1,2,\dotsc, n-1$}\}
+(w_n + r_n) - w_{\alpha} &;~~~ e \in \left\{(\alpha, t) : \alpha \in \mathcal{T} \setminus \{n\}\right\}
+\end{cases},\\
+s &= \{\textrm{število tekem, ki jih morajo odigrati ekipe $1,2,\dotsc,n-1$}\},\\
+t &= \{\textrm{število točk, ki jih bodo na koncu imele ekipe $1,2,\dotsc, n-1$}.\}
 \end{align*}
 
-To izgleda izjemno grdo in nepregledno, zato si poglejmo še shemo pretočnega omrežja.
+To izgleda izjemno grdo in nepregledno, zato si poglejmo še shemo ravnokar definiranega pretočnega omrežja, ki je ponazorjeno na sliki \ref{fig:baseball}.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.9]{images/baseball1.pdf}
+  \caption{Omrežje, ki modelira problem eliminacije ekip v baseballu.}
+  \label{fig:baseball}
+\end{figure}
+
+Opazimo, da nikjer v omrežju nimamo ekipe $n$, ravno za katero nas zanima, ali ima še možnosti za zmago. Ekipe $n$ nismo pozabili, marveč smo jo nalašč izpustili. Predpostavimo
+namreč lahko, da če ima ekipa $n$ še možnosti za zmago (in ne rabi zmagati vseh preostalih iger), lahko kar rečemo, da bo zmagala vse preostale igre. S tem lahko vse, kar je povezano z ekipo $n$, izbrišemo iz omrežja.\\
+
+Razložimo, kaj to omrežje pomeni. Vozlišče $s$ predstavlja vse igre, ki še morajo biti odigrane in ki ne vključujejo ekipe $n$. V naslednjem nivoju imamo vozlišča oblike $(i,j)$, ki predstavljajo tekme med ekipama $i$ in $j$, ki še morajo biti odigrane.
+Kot nam je že znano, $r_{ij}$ predstavlja število takih tekem. Utež na teh povezavah je torej očitno smiselna.
+
+Na naslednjem nivoju imamo vozlišča oblike $i$, kjer vsako vozlišče predstavlja ekipo $i$. Zopet je naša ekipa $n$ izključena iz že obrazloženega razloga. Povezave, ki vstopajo v ta vozlišča, imajo omejitev neskončno, saj pravzaprav več kot $r_{ij}$ tako ali tako ne bodo mogla dobiti.
+
+Na koncu vsa vozlišča, ki predstavljajo ekipe, povežemo v skupen ponor $t$. Uteži na povezavah, ki vstopajo v $t$, predstavljajo, koliko tekem lahko $i$-ta ekipa še zmaga, da bo naša ekipa $n$ na koncu zmagala prvenstvo. To je ravno razlika med končnim številom zmag ekipe $n$, to je $w_n + r_n$ in številom zmag,
+ki jih je ekipa $i$ že dosegla, torej $w_i$.
+
+Kako pa si lahko pomagamo s tem omrežjem pri določanju, ali ima naša ekipa še vedno možnost za končno zmago?
+Označimo \[ r = \sum_{i = 1}^{n-1} r_i = \sum_{i=1}^{n-1} \sum_{j = i+1}^{n-1} r_{ij}. \] Opazimo, da je to teoretično največji možen pretok v našem
+pretočnem omrežju, saj več kolikor $r$ ne moremo spraviti iz izvira $s$, lahko pa se seveda zgodi, da je maksimalen pretok skozi omrežje manjši. Tako se nam porodi ideja, ki je po zgornjem razmisleku pravilna, da
+ima naša ekipa $n$ še možnosti za zmago, če je vrednost maksimalnega pretoka $f$, torej $|f|$, enaka $r$.
+
+\begin{opomba}
+  Če bi nas v splošnem namesto za zadnjo ekipo, torej ekipo $n$, zanimalo, ali lahko ekipa $k \in \{1, 2, \dotsc, n\}$ zmaga prvenstvo, se stvari lotimo na povsem enak način. Ekipo $k$ izključimo iz omrežja, formula za $r$ pa se prepiše v
+  \[ r = \sum_{\substack{i \in \{1, \dotsc n\}\\i \neq k}} r_i = \sum_{\substack{i,j \in \{1, \dotsc, n\}\\ i < j\\ i, j\neq k}} r_{ij}. \]
+\end{opomba}
 
 
 
@@ -1003,8 +1064,13 @@ To izgleda izjemno grdo in nepregledno, zato si poglejmo še shemo pretočnega o
 
 \section*{Slovar strokovnih izrazov}
 
-\geslo{}{}
-\geslo{}{}
+\geslo{potisni-povišaj}{push-relabel}
+\geslo{pretok, tok}{flow}
+\geslo{psevdopretok}{pseudoflow}
+\geslo{predpretok}{preflow}
+\geslo{zasičiti}{saturate}
+\geslo{izvir}{source}
+\geslo{ponor}{sink, terminal}
 
 
 % seznam uporabljene literature
@@ -1014,13 +1080,20 @@ To izgleda izjemno grdo in nepregledno, zato si poglejmo še shemo pretočnega o
 T.H.~Cormen, C.E.~Leiserson, R.L.~Rivest in C.~Stein, \emph{Introduction to Algorithms}, MIT Press, Massachusetts, 2009.
 
 \bibitem{uvtg}
-R.J.~Wilson, J.J.~Watkins, \emph{Uvod v teorijo grafov}, DMFA založništvo, Ljubljana, 1997.
+R.J.~Wilson in J.J.~Watkins, \emph{Uvod v teorijo grafov}, DMFA založništvo, Ljubljana, 1997.
 
 \bibitem{cpp}
 S.~Meyers, \emph{Effective Modern C++}, O'Reilly Media, Kalifornija, 2014.
 
 \bibitem{ad}
-J.~Kleinberg, E.~Tardos, \emph{Algorithm design}, Pearson Education Limited, London, 2013.
+J.~Kleinberg in E.~Tardos, \emph{Algorithm design}, Pearson Education Limited, London, 2013.
+
+\bibitem{aicpp}
+R.~Sedgewick, \emph{Algorithms in C++}, Addison-Wesley Professional, Boston, 1998.
+
+\bibitem{baseball}
+Wikipedia, \emph{Maximum flow problem}, dostopno na \url{https://en.wikipedia.org/wiki/Maximum_flow_problem}, zadnji dostop 14. marec 2018.
+
 \end{thebibliography}
 
 \end{document}
