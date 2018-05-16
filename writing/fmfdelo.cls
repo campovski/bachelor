@@ -13,30 +13,6 @@
 \newcommand{\@unless}[2]{\ifthenelse{#1}{\relax}{#2}}
 \newcommand{\@blank}[1]{\equal{#1}{}}
 
-% Zastareli ukazi
-\newcommand{\@oldcommand}[2]{
-  \newcommand{#1}{
-    \AtEndDocument{%
-      \PackageWarningNoLine{izpit}{%
-        Ukaz \protect#1\space je zastarel.\MessageBreak
-        Uporabite ukaz \protect#2%
-      }%
-    }%
-    #2%
-  }
-}
-\newcommand{\@oldoption}[2]{
-  \DeclareOption{#1}{
-    \AtEndDocument{%
-      \PackageWarningNoLine{izpit}{%
-        Možnost \protect#1\space je zastarela.\MessageBreak
-        Uporabite možnost \protect#2%
-      }%
-    }%
-    \ExecuteOptions{#2}%
-  }
-}
-
 \newboolean{@brezpaketov}         % Ali naj ne nalozimo dodatnih paketov?
 
 %-----------------------------------------------------------------------------
@@ -60,15 +36,38 @@
 %-----------------------------------------------------------------------------
 %                             Nalaganje paketov
 %-----------------------------------------------------------------------------
-
 % Za osnovo si vzamemo amsart ter nalozimo pakete.
 \LoadClass[12pt, a4paper]{amsart}
 \@unless{\boolean{@brezpaketov}}{
   \RequirePackage{amsfonts,amsmath,amssymb}
-  \RequirePackage{hyperref,url}
   \RequirePackage[slovene]{babel}
   \RequirePackage[utf8]{inputenc}
-  \RequirePackage{hhline}
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage{silence}
+  \WarningFilter{hyperref}{Option}
+  \RequirePackage{hyperxmp}
+  \RequirePackage[pdfa,pdfapart=1,pdfaconformance=B]{hyperref}
+
+  % algorithms
+  \RequirePackage{algpseudocode}  % za psevdokodo
+  \RequirePackage{algorithm}      % za
+  \floatname{algorithm}{Algoritem}
+  \renewcommand{\listalgorithmname}{Kazalo algoritmov}
+  \algnewcommand\algorithmicto{\textbf{to}}
+  \algnewcommand\algorithmicin{\textbf{in}}
+  \algnewcommand\algorithmicforeach{\textbf{for each}}
+  \algrenewtext{For}[3]{\algorithmicfor\ #1 $\gets$ #2\ \algorithmicto\ #3\ \algorithmicdo}
+  \algdef{S}[FOR]{ForEach}[2]{\algorithmicforeach\ #1\ \algorithmicin\ #2\ \algorithmicdo}
+}
+\newcommand{\zapisiMetaPodatke}{
+  \hypersetup{pdfencoding=auto, psdextra,
+    bookmarksopen, bookmarksdepth=3,
+    pdfauthor=\@avtor,
+    pdftitle=\@naslov,
+    pdfsubject=\@povzetek,
+    pdfkeywords=\@kljucnebesede}
+  \RequirePackage[a-1b]{pdfx}
+  \let\C\undefined
 }
 
 %-----------------------------------------------------------------------------
@@ -83,7 +82,7 @@
 \topmargin-5mm
 \addtolength{\footskip}{10pt}
 \pagestyle{plain}
-\overfullrule=15pt 
+\overfullrule=15pt
 
 %-----------------------------------------------------------------------------
 %                             Oblikovanje glave
@@ -117,8 +116,8 @@
 % ukazi za matematicna okolja
 \theoremstyle{definition} % tekst napisan pokoncno
 \newtheorem{definicija}{Definicija}[section]
-\newtheorem{opomba}[definicija]{Opomba}
 \newtheorem{primer*}[definicija]{Primer}
+\newtheorem{opomba}[definicija]{Opomba}
 \newtheorem{zgled*}[definicija]{Zgled}
 
 \newenvironment{dokaz}[1][Dokaz]{\begin{proof}[#1]}{\end{proof}}
@@ -136,6 +135,7 @@
 
 % Ukaz za izpis začetnih strani.
 \AtBeginDocument{%
+
 % od tod do povzetka ne spreminjaj nicesar
 \thispagestyle{empty}
 \noindent{\large
@@ -174,8 +174,8 @@ Ljubljana, \@letnica}
 \end{center}
 \@abstract
 \vfill\noindent
-{\bf Math. Subj. Class. (2010):} \@klasifikacija \\[1mm]  
-{\bf Ključne besede:} \@kljucnebesede \\[1mm]  
-{\bf Keywords:} \@keywords 
+{\bf Math. Subj. Class. (2010):} \@klasifikacija \\[1mm]
+{\bf Ključne besede:} \@kljucnebesede \\[1mm]
+{\bf Keywords:} \@keywords
 \pagebreak
 }

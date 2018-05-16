@@ -1,9 +1,3 @@
-// Implementacija algoritma potisni-povisaj v C++,
-// ki deluje v O(V^3).
-// Za vec informacij o algoritmu obiscite
-// https://en.wikipedia.org/wiki/Push-povisaj_maximum_flow_algorithm
-// povezava na github...
-
 //===================================================================
 //
 //        KNJIZNICE IN DEFINICIJE
@@ -37,10 +31,11 @@ void inicializiraj_predpretok();
 void potisni(int u, int v);
 int najnizji_sosed(int u);
 void napolni_graf();
+void sprosti_pomnilnik();
 
 // Globalne spremenljivke.
 
-// Graf predstavimo z vektorjem vozlisc.
+// Množico vozlisc predstavimo z vektorjem.
 vector<Vozlisce> vozlisca;
 
 // V vrsto dajemo vozlisca, ki so v presezku. S tem lahko v
@@ -52,15 +47,6 @@ queue<int> presezki;
 // presezke. S tem dosezemo, da se vsako vozlisce v presezkih
 // pojavi kvecjemu enkrat.
 vector<bool> viden;
-
-// Matrika povezav grafa. Ce je p[i][j] true, to pomeni, da
-// povezava obstaja. S tem se izognemo temu, da bi se v sosedih
-// vozlisc zaceli sosedi ponavljati. Prej smo namrec za vsako
-// vozlisce imeli vektor sosedov in s tem ponazorili povezave.
-// V obeh primerih s tem zmanjsamo casovno zahtevnost iskanja
-// sosedov iz O(E) na O(V), saj namesto, da bi soseda iskali po
-// vseh povezavah, iscemo soseda po vseh vozliscih.
-bool** p;
 
 int** c; // Matrika kapacitet povezav.
 int** f; // Matrika toka.
@@ -80,6 +66,11 @@ int main()
 
     // Izvedi algoritem POTISNI-POVISAJ in izpisi rezultat.
     cout << "Maksimalni pretok je " << potisni_povisaj() << endl;
+    
+    // Pocistimo pomnilnik, ki smo ga porabili.
+    sprosti_pomnilnik();
+    
+    return 0;
 }
 
 //===================================================================
@@ -128,7 +119,7 @@ void inicializiraj_predpretok()
 
     for (int v = 0; v < vozlisca.size(); v++)
     {
-        if (p[0][v])
+        if (c[0][v] > 0)
         {
             // Zasici povezavo.
             f[0][v] = c[0][v];
@@ -138,7 +129,6 @@ void inicializiraj_predpretok()
 
             // Doda residualno povezavo.
             f[v][0] -= f[0][v];
-            p[v][0] = true;
 
             // V vozliscu s posodobi oddani tok.
             vozlisca[0].e -= f[0][v];
@@ -161,16 +151,13 @@ int najnizji_sosed(int u)
 
     for (int v = 0; v < vozlisca.size(); v++)
     {
-        if (p[u][v])
+        // Ce je visina soseda manjsa od trenutne najmanjse
+        // visine in ce povezava ni zasicena, potem je to
+        // kandidat za najnizjega soseda.
+        if (vozlisca[v].h < min_visina && c[u][v] - f[u][v] > 0)
         {
-            // Ce je visina soseda manjsa od trenutne najmanjse
-            // visine in ce povezava ni zasicena, potem je to
-            // kandidat za najnizjega soseda.
-            if (vozlisca[v].h < min_visina && c[u][v] - f[u][v] > 0)
-            {
-                min_visina = vozlisca[v].h;
-                sosed = v;
-            }
+            min_visina = vozlisca[v].h;
+            sosed = v;
         }
     }
 
@@ -190,9 +177,6 @@ void potisni(int u, int v)
     // Posodobi tok prek povezave in residualne povezave.
     f[u][v] += delta;
     f[v][u] -= delta;
-
-    // Doda obratno povezavo.
-    p[v][u] = true;
 
     // Ce smo z vozliscem opravili, ga odstranimo iz presezkov.
     if (vozlisca[u].e == 0)
@@ -221,7 +205,6 @@ void napolni_graf()
 
     c = (int**) calloc(V, sizeof(int*));
     f = (int**) calloc(V, sizeof(int*));
-    p = (bool**) calloc(V, sizeof(int*));
 
     for (int i = 0; i < V; i++)
     {
@@ -229,13 +212,18 @@ void napolni_graf()
         viden.push_back(false);
         c[i] = (int*) calloc(V, sizeof(int));
         f[i] = (int*) calloc(V, sizeof(int));
-        p[i] = (bool*) calloc(V, sizeof(bool));
     }
 
     int u, v, kapaciteta;
     while (scanf("%d %d %d\n", &u, &v, &kapaciteta) != EOF)
     {
         c[u][v] += kapaciteta;
-        p[u][v] = 1;
     }
+}
+
+// Sprosti pomnilnik, ki smo ga med izvajanjem uporabili.
+void sprosti_pomnilnik()
+{
+    free(c);
+    free(f);
 }
