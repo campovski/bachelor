@@ -8,7 +8,7 @@
 % naslednje ukaze ustrezno napolnite
 \avtor{Marcel Čampa}
 
-\naslov{Algoritem potisni-povišaj za iskanje maksimalnih pretokov}
+\naslov{Algoritem potisni-povišaj za iskanje maksimalnih pre\-to\-kov}
 \title{Push-relabel algorithm for maximum flow problem}
 
 % navedite ime mentorja s polnim nazivom: doc.~dr.~Ime Priimek,
@@ -25,7 +25,7 @@
 
 %  V povzetku na kratko opišite vsebinske rezultate dela. Sem ne sodi razlaga organizacije dela --
 %  v katerem poglavju/razdelku je kaj, pač pa le opis vsebine.
-\povzetek{Ideja dela je spoznati se z osnovnimi pojmi teorije grafov, kot so omrežje, pretok in maksimalni pretok ter predstaviti algoritem potisni-povišaj za iskanje maksimalnega pretoka v omrežju. Algoritem je tudi implementiran, pokazana pa je tudi njegova časovna zahtevnost in pravilnost delovanja. Uporabnost iskanja maksimalnih pretokov je ponazorjena z dvema primeroma iz vsakdanjega življenja.}
+\povzetek{Ideja dela je spoznati se z osnovnimi pojmi teorije grafov, kot so omrežje, pretok in maksimalni pretok ter predstaviti algoritem potisni-povišaj za iskanje maksimalnega pretoka v omrežju. Algoritem je tudi implementiran, pokazana pa je tudi njegova časovna zahtevnost in pravilnost delovanja. Uporabnost iskanja maksimalnih pre\-to\-kov je ponazorjena z dvema primeroma iz vsakdanjega življenja.}
 
 %  Prevod slovenskega povzetka v angleščino.
 \abstract{The idea of this work is to get used to basic concepts of graph theory, e.g. network, flow and maximum flow. The core is an explanation of push-relabel algorithm for finding maximum flow through a network. The algorithm is also implemented and its time complexity and correctness are proven. It is also shown with two examples how one can use maximum flows in real life.}
@@ -33,7 +33,7 @@
 % navedite vsaj eno klasifikacijsko oznako --
 % dostopne so na www.ams.org/mathscinet/msc/msc2010.html
 \klasifikacija{05C85, 68W05, 90C27, 90C35}
-\kljucnebesede{pretok, potisni-povišaj, graf, omrežje, maksimalni pretok, optimizacija} % navedite nekaj ključnih pojmov, ki nastopajo v delu
+\kljucnebesede{pretok, potisni-povišaj, graf, omrežje, maksimalni pretok, opti\-mi\-za\-ci\-ja} % navedite nekaj ključnih pojmov, ki nastopajo v delu
 \keywords{flow, push-relabel, graph, network, maximum flow, optimization} % angleški prevod ključnih besed
 
 \zapisiMetaPodatke  % poskrbi za metapodatke in veljaven PDF/A-1b standard
@@ -102,12 +102,12 @@ Naj bo $G = (V,E)$ graf in $(G,c)$ omrežje na grafu $G$. \textbf{Pretočno omre
 \textbf{Psevdopretok} je funkcija $f \colon V \times V \rightarrow \mathbb{R}$, ki zadošča pogojema:
 \begin{enumerate}
 \item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) = - f(v,u)$.
-\item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija prepustnosti.
+\item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija pre\-pu\-stno\-sti.
 \end{enumerate}
 \end{definicija}
 
 \begin{definicija}\label{def:resprepustnost}
-\textbf{Residualna prepustnost} povezave glede na trenuten psevdopretok $f$ je funkcija $c_f \colon V \times V \rightarrow \mathbb{R}^+_0 \cup \{\infty\}$, definirana kot razlika prepustnosti povezave in trenutnega toka preko nje. Velja torej $c_f(u,v) = c(u,v) - f(u,v)$.
+\textbf{Residualna prepustnost} povezave glede na trenuten pse\-vdo\-pre\-tok $f$ je funkcija $c_f \colon V \times V \rightarrow \mathbb{R}^+_0 \cup \{\infty\}$, definirana kot razlika prepustnosti povezave in trenutnega toka preko nje. Velja torej $c_f(u,v) = c(u,v) - f(u,v)$.
 \end{definicija}
 
 \begin{definicija}
@@ -181,7 +181,7 @@ Privzeli bomo, da če v grafu obstaja povezava $(u,v)$, potem ne obstaja povezav
 V tem razdelku si bomo podrobneje ogledali algoritem \textit{potisni-povišaj}. Začeli bomo s kratkim opisom delovanja algoritma in intuitivno razložili, kako algoritem deluje. Nato si bomo pogledali psevdokodo algoritma in se z njo pobližje spoznali na zgledu. Sledila bo implementacija algoritma z rahlo izboljšavo v programskem jeziku C++. Pokazali bomo pravilnost delovanja algoritma in njene implementacije ter časovno zahtevnost algoritma.
 
 \subsection{O algoritmu}
-Algoritem potisni-povišaj deluje po preprostem principu iz narave. Predsavljajmo si, da imamo rečno omrežje, ki se začne v eni točki in konča v eni točki. Z drugimi besedami imamo eno reko, ki pa se vmes poljubno deli in združuje. Seveda je na Zemlji prisotna gravitacijska sila, ki povzroči, da voda teče od višje točke proti nižji, recimo od izvira v hribih do ponora v morje, vmes pa ubira tako pot, da nikjer ne gre navzgor. V jeziku grafov lahko predstavimo omenjeni pojav na naslednji način. Tam, kjer se reka deli oziroma združi, postavimo vozlišče grafa. Del reke med dvema razvejiščema predstavlja povezavo med razvejiščema pripadajočima vozliščema. Izvir in ponor reke predstavljata vozlišči $s$ in $t$. Vsakemu vozlišču pripišemo višino, na kateri se nahaja, in količino vode, ki je vanj pritekla in odtekla. Seveda se v naravi ne zgodi (razen v primeru neurij), da bi v razvejišče priteklo več vode, kot pa je je iz njega odteklo. Prav tako ne more priteči manj vode, kot je odteče.
+Algoritem potisni-povišaj deluje po preprostem principu iz na\-ra\-ve. Predsavljajmo si, da imamo rečno omrežje, ki se začne v eni točki in konča v eni točki. Z drugimi besedami imamo eno reko, ki pa se vmes poljubno deli in združuje. Seveda je na Zemlji prisotna gravitacijska sila, ki povzroči, da voda teče od višje točke proti nižji, recimo od izvira v hribih do ponora v morje, vmes pa ubira tako pot, da nikjer ne gre navzgor. V jeziku grafov lahko predstavimo omenjeni pojav na naslednji način. Tam, kjer se reka deli oziroma združi, postavimo vozlišče grafa. Del reke med dvema razvejiščema predstavlja povezavo med razvejiščema pripadajočima vozliščema. Izvir in ponor reke predstavljata vozlišči $s$ in $t$. Vsakemu vozlišču pripišemo višino, na kateri se nahaja, in količino vode, ki je vanj pritekla in odtekla. Seveda se v naravi ne zgodi (razen v primeru neurij), da bi v razvejišče priteklo več vode, kot pa je je iz njega odteklo. Prav tako ne more priteči manj vode, kot je odteče.
 
 Sedaj, ko smo se spomnili, kako deluje mati narava, in to prevedli v matematični jezik, si podrobneje poglejmo, kako deluje algoritem potisni-povišaj. Začnemo z omrežjem (od sedaj bomo rajši kot o grafih govorili o omrežjih) $G = (V, E, s, t)$ in funkcijama $c\colon V \times V \rightarrow \N_0$, ki vsaki povezavi priredi njeno kapaciteto, in $f\colon V \times V \rightarrow \Z$, ki za vsako povezavo pove, koliko vode teče v nekem trenutku preko nje. Vozliščem $v \in V$ priredimo še funkciji $h\colon V \rightarrow \N_0$, ki določa višino vozlišča, in $e\colon V \rightarrow \N_0$, ki pove, koliko preveč vode je priteklo v neko vozlišče.\footnote{Tu smo za kodomene vzeli $\N_0$ oziroma $\Z$ namesto različic z $\R$ iz definicij. Tega nam ni bilo potrebno storiti, vendar se bomo v nadaljevanju ukvarjali s celoštevilskimi vrednostmi, v definicijah pa je še vseeno smiselno pisati, da so stvari definirane na realnih številih.} Seveda velja \[e(u) = \frac{1}{2}\left(\sum_{v \in V} f(v,u) - \sum_{v \in V} f(u,v)\right).\] Algoritem na začetku nastavi višino vseh vozlišč razen vozlišča $s$ na nič in višino $s$ na $|V|$. Tako na začetku velja $h(s) = |V|$ in $h(u) = 0$, $u \in V \setminus \{s\}$. Nato potisnemo iz $s$ tok v sosednja vozlišča tako, da zasičimo povezave, torej da velja $f(s, v) = c(s, v)$, za vse $v \in V$. Poleg tega dodamo v residualno omrežje še obratne povezave, katerim nastavimo $f(v,s) = -f(s,v)$, da zadostimo pogoju (1) iz definicije psevdopretoka (definicija \ref{def:psevdopretok}). S tem smo ustvarili tako imenovani \textit{predpretok}. To smo lahko storili, ker je višina vozlišča $s$ večja kot višina sosednjih vozlišč $v$, saj $h(s) = |V| > 0 = h(v)$.
 
@@ -243,7 +243,7 @@ POTISNI-POVIŠAJ(G,s)
 3       izvedi mogočo operacijo
 \end{verbatim}~
 
-Na videz nedolžna, vendar skriva rahlo prepreko do povsem direktne implementacije. Vprašanje, ki se pojavi, je namreč, kako vedeti, ali lahko potisnemo oziroma povišamo. Na to vprašanje bomo odgovorili v nadaljevanju. Oglejmo si najprej zgled delovanja algoritma in sproti se nam morda porodi ideja.\\
+Na videz nedolžna, vendar skriva rahlo prepreko do povsem direktne im\-ple\-men\-ta\-ci\-je. Vprašanje, ki se pojavi, je namreč, kako vedeti, ali lahko potisnemo oziroma po\-vi\-ša\-mo. Na to vprašanje bomo odgovorili v nadaljevanju. Oglejmo si najprej zgled delovanja algoritma in sproti se nam morda porodi ideja.\\
 
 \subsection{Primer delovanja algoritma}
 
@@ -270,7 +270,7 @@ Omrežje $G$ na začetku izgleda takole:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-1/graf2-1-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-1/graf2-1-1.jpg}
   \caption{Pretočno omrežje, ki ga bomo uporabili kot zgled delovanja algoritma potisni-povišaj.}
 \end{figure}
 
@@ -280,14 +280,14 @@ obstaja residualna povezava $(v,u)$ kapacitete $c(v,u) = 0$, po kateri teče tok
 pogled izgleda malce čudno, vendar če se spomnimo definicij \ref{def:omrezjeprepustnost}, \ref{def:psevdopretok} in \ref{def:resprepustnost}, vidimo,
 da se stvari ujemajo, saj $c, c_f \colon V \times V \rightarrow \R^+_0 \cup \{\infty\}$ in $c_f(v,u) = c(v,u) - f(v,u) = 0 - (-f(u,v)) = f(u,v) \geq 0$.}
 
-Najprej inicializiramo predpretok. Višino in presežek toka v vseh vozliščih nastavimo na $0$ in vsaki povezavi
+Najprej inicializiramo predpretok. Višino in presežek toka v vseh vozliščih na\-sta\-vi\-mo na $0$ in vsaki povezavi
 damo tok $0$. Nato višino vozlišča $s$ nastavimo na $|V| = 5$ in vsaki povezavi, ki se začne v $s$, torej
 povezavi $(0,1)$ in $(0,2)$, zasičimo. Na koncu še posodobimo presežek toka v vozliščih, sosednjim vozlišču $s$.
 Omrežje sedaj izgleda tako:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-2/graf2-2-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-2/graf2-2-1.jpg}
   \caption{Pretočno omrežje po inicializaciji predpretoka. Par $(h, e)$ v vozlišču $u$ določa trenutno višino vozlišča $h(u)$ ter njegov presežek toka $e(u)$. Sivo obarvani sta vozlišči v presežku. Par $f/c$ na povezavi določa, kolikšen tok $f$ teče po tej povezavi in kolikšna je prepustnost povezave ($c$).}
 \end{figure}
 
@@ -297,7 +297,7 @@ $(1,3)$ $\delta = \min \{e(1), c(1,3) - f(1,3)\} = 5$ enot. Posodobimo $f$ in $e
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-3/graf2-3-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-3/graf2-3-1.jpg}
   \caption{Opravili smo povišanje vozlišča $1$ in potistnili tok iz njega.}
 \end{figure}
 
@@ -307,7 +307,7 @@ povezavo $(2,1)$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-4/graf2-4-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-4/graf2-4-1.jpg}
   \caption{Opravili smo povišanje vozlišča $2$ in potistnili tok iz njega.}
 \end{figure}
 
@@ -317,7 +317,7 @@ ostalo v presežku.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-5/graf2-5-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-5/graf2-5-1.jpg}
   \caption{Potisnili smo tok po povezavi $(1,3)$.}
 \end{figure}
 
@@ -326,7 +326,7 @@ vendar ga moramo najprej povišati na višino $1$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-6/graf2-6-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-6/graf2-6-1.jpg}
   \caption{Povišali smo vozlišče $3$ in potisnili tok po povezavi $(3,4)$.}
 \end{figure}
 
@@ -340,19 +340,19 @@ v vozlišče $1$. To pravzaprav pomeni, da pošljemo tok po residualni povezavi 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-7/graf2-7-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-7/graf2-7-1.jpg}
   \caption{Povišali smo vozlišče $3$ in potisnili tok po residualni povezavi $(3,1)$, kar je analogno temu, da smo zmanjšali tok po povezavi $(1,3)$.}
 \end{figure}
 
-Prišli smo do najbolj zanimivega dela celega algoritma, ki morda na prvi pogled izgleda precej smešno. Izberemo si vozlišče $1$, iz katerega bi radi
-potisnili presežek. Če to želimo storiti, moramo najprej vozlišče povišati, in sicer na $\min\{h(0), h(2), h(3)\} + 1 = 3$. Sedaj lahko potisnemo tok po residualni
+Prišli smo do najbolj zanimivega dela celega algoritma, ki morda na prvi pogled iz\-gle\-da precej smešno. Izberemo si vozlišče $1$, iz katerega bi radi
+potisnili presežek. Če to želimo storiti, moramo najprej vozlišče povišati, in sicer na $\min\lbrace h(0), h(2), h(3)\rbrace + 1 = 3$. Sedaj lahko potisnemo tok po residualni
 povezavi $(1,2)$ ali pa po povezavi $(1,3)$. Logično bi se nam zdelo, da toka ne bomo pošiljali nazaj v vozlišče $3$, od koder smo ga ravno dobili, ampak storili
 bomo ravno to, saj želimo tok najprej poslati po originalni povezavi, šele nato po residualni. S tem bi potencialno omogočili, da pride več toka v nova vozlišča in s tem
 ,,bližje'' ponoru. Povišamo tako $1$ na višino $3$ in pošljemo $4$ enote nazaj v vozlišče $3$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-8/graf2-8-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-8/graf2-8-1.jpg}
   \caption{Povišali smo vozlišče $1$ in spet poslali tok v vozlišče $3$.}
   \label{fig:slika8}
 \end{figure}
@@ -361,17 +361,17 @@ Kaj pa sedaj? Iz vozlišča $3$ moramo spet vrniti tok nazaj v $1$, pred tem pa 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-9/graf2-9-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-9/graf2-9-1.jpg}
   \caption{Povišali smo vozlišče $3$ in spet vrnili tok v vozlišče $1$.}
   \label{fig:slika9}
 \end{figure}
 
 V tem trenutku pa lahko končno naredimo majhen napredek, saj lahko potisnemo iz vozlišča $1$ nazaj v vozlišče $2$, namreč $h(1) > h(2)$ in obstaja povezava $(1,2)$ v residualnem
-omrežju. Seveda lahko potisnemo le $\delta = \min\{e(1), f(u,v)\} = \min\{5,4\} = 4$, torej bo nekaj toka še ostalo v vozlišču $1$.
+omrežju. Seveda lahko potisnemo le $\delta = \min\{e(1), f(u,v)\} = \min\{5,4\}$ $= 4$, torej bo nekaj toka še ostalo v vozlišču $1$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-10/graf2-10-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-10/graf2-10-1.jpg}
   \caption{Vrnili smo tok iz vozlišča $1$ v vozlišče $2$.}
   \label{fig:slika10}
 \end{figure}
@@ -381,7 +381,7 @@ $4$ enote nazaj v vozlišče $1$ po povezavi $(2,1)$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-11/graf2-11-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-11/graf2-11-1.jpg}
   \caption{Povišamo vozlišče $2$ in spet pošljemo tok po povezavi $(2,1)$.}
 \end{figure}
 
@@ -389,7 +389,7 @@ Podobno premislimo kot smo pri sliki \ref{fig:slika8}. Ugotovimo, da moramo povi
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-12/graf2-12-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-12/graf2-12-1.jpg}
   \caption{Povišamo vozlišče $1$ in spet pošljemo tok po povezavi $(1,3)$.}
 \end{figure}
 
@@ -397,7 +397,7 @@ Razmislimo podobno kot pri sliki \ref{fig:slika9} -- povišamo vozlišče $3$ in
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-13/graf2-13-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-13/graf2-13-1.jpg}
   \caption{Povišamo vozlišče $3$ in vrnemo tok v vozlišče $1$.}
 \end{figure}
 
@@ -406,7 +406,7 @@ iz $1$ v $2$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-14/graf2-14-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-14/graf2-14-1.jpg}
   \caption{Vrnemo tok iz vozlišča $1$ v vozlišče $2$.}
 \end{figure}
 
@@ -415,7 +415,7 @@ lahko pošljemo $4$ enote. V vozlišču $2$ nam bosta potem ostali še $2$ enoti
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-15/graf2-15-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-15/graf2-15-1.jpg}
   \caption{Povišamo vozlišče $2$ na $6$. Najprej pošljemo tok $4$ po originalni povezavi $(2,1)$, nato pa vrnemo tok $2$ v $s$.}
 \end{figure}
 
@@ -425,7 +425,7 @@ opraviti nobene operacije več.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/graf2-16/graf2-16-1.jpg}
+  \includegraphics[scale=.358]{images/graf2-16/graf2-16-1.jpg}
   \caption{Povišamo vozlišče $1$ na $6$ in vrnemo tok $5$ v $s$. Tako izgleda naše omrežje po končanem algoritmu.}
 \end{figure}
 
@@ -444,7 +444,7 @@ nam povedo, kolikšno količino moramo poslati po povezavi $(u,v)$, da bo pretok
 
 \subsection{Implementacija algoritma v programskem jeziku C++}
 
-Najprej si poglejmo idejo implementacije. Prvo vprašanje, ki se nam postavi, je, kako bomo predstavili graf. Za vsako vozlišče si moramo zapomniti njegovo višino in presežek toka, ki se v njem nahaja. Odločimo se, da bomo vozlišče predstavili s strukturo, saj bo tako koda bolj berljiva. Lahko bi sicer uporabili razred, vendar ni potrebe, lahko pa bi naredili tudi dva vektorja, enega, ki bi predstavljal višinsko funkcijo in drugega, ki bi povedal, koliko presežka toka je v vsakem izmed vozlišč. Za predstavitev grafa bomo tako uporabili vektor vozlišč in pa matriko $p\in \{0,1\}^{V \times V}$ boolovih vrednosti. Element $p_{ij}$ bo povedal, ali je povezava $(i,j)$ v grafu ali ne. Prav tako si bomo definirali dve matriki $c, f \in \N_0^{V \times V}$. Matrika $c$ bo imela na $ij$-tem mestu kapaciteto povezave $(i,j)$, matrika $f$ pa pretok preko povezave $(i,j)$.
+Najprej si po\-glej\-mo idejo implementacije. Prvo vprašanje, ki se nam postavi, je, kako bomo predstavili graf. Za vsako vozlišče si moramo zapomniti njegovo višino in presežek toka, ki se v njem nahaja. Odločimo se, da bomo vozlišče predstavili s strukturo, saj bo tako koda bolj berljiva. Lahko bi sicer uporabili razred, vendar ni potrebe, lahko pa bi naredili tudi dva vektorja, enega, ki bi predstavljal višinsko funkcijo in drugega, ki bi povedal, koliko presežka toka je v vsakem izmed vozlišč. Za predstavitev grafa bomo tako uporabili vektor vozlišč in pa matriko $p\in \{0,1\}^{V \times V}$ boolovih vrednosti. Element $p_{ij}$ bo povedal, ali je povezava $(i,j)$ v grafu ali ne. Prav tako si bomo definirali dve matriki $c, f \in \N_0^{V \times V}$. Matrika $c$ bo imela na $ij$-tem mestu kapaciteto povezave $(i,j)$, matrika $f$ pa pretok preko povezave $(i,j)$.
 
 Definirali si bomo še vrsto, v katero bomo spravljali vozlišča, ki imajo presežek toka. S tem bomo lahko do elementov, na katerih moramo opraviti operacijo potiska ali povišanja, dostopali v konstantnem času, s tem pa ne bomo uničili pravilnosti algoritma. Vzeli bomo namreč prvo vozlišče v vrsti, na njem naredili ali \texttt{POTISNI} ali \texttt{POVIŠAJ}, in ga odstranili iz vrste, če bo po opravljeni operaciji njegov presežek ničeln. Prav tako bomo na konec vrste dodali vozlišče, v katerega smo potisnili tok, če je seveda šlo za operacijo potiska. Na tej točki bomo potrebovali še vektor boolovih vrednosti, ki bo za vsako vozlišče povedal, ali smo ga že dodali med presežke. S tem se izognemo podvajanju elementov v vrsti presežkov in tako pripomoremo k hitrejšemu delovanju algoritma; in hkrati tudi pravilnejšemu, saj se lahko zgodi, da bi algoritem želel opravljati potisk ali povišanje na vozlišču, ki smo ga izpraznili, ko se je prejšnjič pojavil v vrsti.
 
@@ -453,11 +453,11 @@ Algoritem bomo razbili na več funkcij. Glavni funkciji bosta \texttt{potisni\_p
 Poglejmo si opis, kaj počne katera izmed funkcij.
 
 \begin{itemize}
-\item \texttt{potisni\_povisaj()}: Izračuna maksimalni pretok v grafu. Najprej inicializira predpretok, nato pa izvaja zanko, dokler obstaja vozlišče s presežkom. Vsakič se odloči, ali bo naredila potisk ali povišanje in potisk. Za povišanjem naredimo takoj potisk zato, da zmanjšamo število vrtljajev zanke in nam tako ni potrebno še enkrat računati najnižjega soseda, saj bo ostal isti.
-\item \texttt{inicializiraj\_predpretok()}: Inicializira predpretok. Nastavi višino vozlišča $s$ na moč množice vozlišč. Nato potisne tok po vseh sosednjih povezavah in posodobi presežke v vozliščih. Vmes tudi doda residualno (obratno) povezavo, katere kapaciteta je $0$, tok po njej pa je enak negativno predznačenemu toku, ki smo ga poslali po originalni povezavi. Če vozlišče, v katerega smo potisnili tok, ni $t$, ga dodamo med vozlišča s presežki in označimo, da je bil tja dodan.
-\item \texttt{potisni(u,v)}: Potisne tok iz vozlišča $u$ v vozlišče $v$. Tok, ki ga lahko potisne, je enak minimumu med presežkom v vozlišču $u$ in residualno kapaciteto povezave $(u,v)$. Če smo vozlišče $u$ izpraznili, ga odstranimo iz vrste presežkov in označimo, da ga ni več notri. Če vozlišče $v$ ni $t$ ali $s$ in še ni bilo dodano med presežke, ga dodamo.
+\item \texttt{potisni\_povisaj()}: Izračuna maksimalni pretok v grafu. Najprej iniciali\-zira predpretok, nato pa izvaja zanko, dokler obstaja vozlišče s presežkom. Vsakič se odloči, ali bo naredila potisk ali povišanje in potisk. Za povišanjem naredimo takoj potisk zato, da zmanjšamo število vrtljajev zanke in nam tako ni potrebno še enkrat računati najnižjega soseda, saj bo ostal isti.
+\item \texttt{inicializiraj\_predpretok()}: Inicializira predpretok. Nastavi višino voz\-lišča $s$ na moč množice vozlišč. Nato potisne tok po vseh sosednjih povezavah in posodobi presežke v vozliščih. Vmes tudi doda residualno (obratno) pove\-zavo, katere kapaciteta je $0$, tok po njej pa je enak negativno predznačenemu toku, ki smo ga poslali po originalni povezavi. Če vozlišče, v katerega smo potisnili tok, ni $t$, ga dodamo med vozlišča s presežki in označimo, da je bil tja dodan.
+\item \texttt{potisni(u,v)}: Potisne tok iz vozlišča $u$ v vozlišče $v$. Tok, ki ga lahko poti\-sne, je enak minimumu med presežkom v vozlišču $u$ in residualno kapaciteto povezave $(u,v)$. Če smo vozlišče $u$ izpraznili, ga odstranimo iz vrste presežkov in označimo, da ga ni več notri. Če vozlišče $v$ ni $t$ ali $s$ in še ni bilo dodano med presežke, ga dodamo.
 \item \texttt{najnizji\_sosed(u)}: Poišče tisto vozlišče $v$ med sosedi $u$, ki ima najmanjšo višino in za katerega je povezava $(u,v)$ v residualnem grafu.
-\item \texttt{napolni\_graf()}: Inicializira vse potrebne spremenljivke. V vektor vozlišč doda vozlišča z višino in presežkom nič. V matriko kapacitet vpiše pripadajoče kapacitete ter v matriki $p$ označi, katere povezave obstajajo. Funkcija predpostavi še, da ima izvir indeks $0$ in ponor indeks $|V| - 1$, torej $s = 0$ in $t = |V| - 1$.
+\item \texttt{napolni\_graf()}: Inicializira vse potrebne spremenljivke. V vektor vozlišč doda vozlišča z višino in presežkom nič. V matriko kapacitet vpiše pri\-pa\-da\-jo\-če kapacitete ter v matriki $p$ označi, katere povezave obstajajo. Funkcija predpostavi še, da ima izvir indeks $0$ in ponor indeks $|V| - 1$, torej $s = 0$ in $t = |V| - 1$.
 \end{itemize}~
 
 Oglejmo si sedaj implementacijo.
@@ -698,13 +698,13 @@ void sprosti_pomnilnik()
 \end{verbatim}~
 
 
-Opazimo naslednjo stvar. V funkciji \texttt{potisni\_povisaj} smo zahtevali, da se program izvaja dokler obstaja vozlišče s presežkom. Spomnimo se, da smo v psevdokodi namreč zapisali, da se mora program izvajati dokler obstaja mogoča operacija potiska ali povišanja. Da sta stvari ekvivalentni, si bomo pogledali v dokazu pravilnosti algoritma (lema \ref{lem:potisk_ali_povisanje}).
+Opazimo naslednjo stvar. V funkciji \texttt{potisni\_povisaj} smo zahtevali, da se pro\-gram izvaja dokler obstaja vozlišče s presežkom. Spomnimo se, da smo v psevdokodi namreč zapisali, da se mora program izvajati dokler obstaja mogoča operacija potiska ali povišanja. Da sta stvari ekvivalentni, si bomo pogledali v dokazu pravilnosti algoritma (lema \ref{lem:potisk_ali_povisanje}).
 
 
 
 \subsection{Pravilnost delovanja algoritma}
 
-V tem podrazdelku bomo s pomočjo lem pokazali, da tako algoritem \texttt{POTISNI-POVIŠAJ} kot tudi njegova implementacija delujeta pravilno. S tem mislimo na to, da se algoritem konča in ob tem vrne pravilen rezultat, torej res pretok, ki je maksimalen. Glavni vir je knjiga \cite{clrs}.\\
+V tem podrazdelku bomo s pomočjo lem pokazali, da tako algoritem \texttt{POTISNI-POVIŠAJ} kot tudi njegova implementacija de\-lujeta pravilno. S tem mislimo na to, da se algoritem konča in ob tem vrne pravilen rezultat, torej res pretok, ki je maksimalen. Glavni vir je knjiga \cite{clrs}.\\
 
 Če si pogledamo, kako deluje funkcija \texttt{potisni}, vidimo, da nikjer v kodi ne uporabimo dejstva, da je razlika višine med vozliščema nujno ena. Vendar to še vseeno zahtevamo.
 
@@ -716,7 +716,7 @@ Ta lema nam pove, da ne obstaja residualna povezava med $u$ in $v$, če je $h(u)
 
 % zgled
 
-Sedaj si poglejmo obljubljeno lemo, ki nam zagotavlja pravilnost delovanja implementacije in postopka, ki smo ga uporabili v zgledu. Spomnimo se namreč, da smo v implementaciji algoritem opravljali, dokler je bilo kakšno vozlišče s presežkom toka, čeprav smo v psevdokodi zapisali, da moramo algoritem opravljati, dokler je mogoča katera izmed operacij \texttt{POTISNI} in \texttt{POVIŠAJ}.
+Sedaj si poglejmo obljubljeno lemo, ki nam zagotavlja pravilnost delovanja im\-plementacije in postopka, ki smo ga uporabili v zgledu. Spomnimo se namreč, da smo v implementaciji algoritem opravljali, dokler je bilo kakšno vozlišče s presežkom toka, čeprav smo v psevdokodi zapisali, da moramo algoritem opravljati, dokler je mogoča katera izmed operacij \texttt{POTISNI} in \texttt{POVIŠAJ}.
 
 \begin{lema}[na vozlišču s presežkom lahko opravimo ali potisk ali povišanje]\label{lem:potisk_ali_povisanje}
 Naj bo $(G=(V,E),c,s,t)$ pretočno omrežje, $f$ predpretok, $h$ višinska funkcija in $e\colon V \rightarrow \N_0$ funkcija, ki za vsako vozlišče pove, kolikšen je v njem presežek toka. Če ima vozlišče $u\in V$ presežek toka, torej $e(u) > 0$, potem lahko na tem vozlišču opravimo ali operacijo \texttt{POTISNI} ali operacijo \texttt{POVIŠAJ}.
@@ -737,7 +737,7 @@ Ker se višine vozlišč spreminjajo le med povišanji, je za dokaz celotne leme
 \end{dokaz}
 
 \begin{lema}\label{lem:h_ostane_visinska}
-Med izvajanjem programa \texttt{POTISNI-POVIŠAJ($G$,$s$)} $h$ vedno zadrži lastnosti višinske funkcije, opisane v definiciji \ref{def:visinska_funkcija}.
+Med izvajanjem programa \texttt{POTISNI-POVIŠAJ($G$,$s$)} $h$ vedno zadrži la\-stnosti višinske funkcije, opisane v definiciji \ref{def:visinska_funkcija}.
 \end{lema}
 
 \begin{dokaz}
@@ -745,7 +745,7 @@ Dokaz bomo naredili s pomočjo indukcije na število osnovnih operacij.
 
 Po inicializaciji predpretoka je $h$ očitno višinska funkcija.
 
-Poglejmo si najprej, kaj se zgodi med operacijo \texttt{POVIŠAJ($u$)}. \texttt{POVIŠAJ($u$)} zagotovi, da za vsako residualno povezavo $(u,v) \in E_f$ po opravljeni operaciji velja $h(u) \leq h(v) +1$. Vzemimo sedaj residualno povezavo, ki vstopa v $u$, recimo $(w,u) \in E_f$. Po lemi \ref{lem:visina_ne_pada} iz $h(w) \leq h(u) + 1$ pred operacijo sledi $h(w) < h(u) + 1$ po operaciji. Torej operacija \texttt{POVIŠAJ($u$)} očitno ohranja $h$ kot višinsko funkcijo.
+Poglejmo si najprej, kaj se zgodi med operacijo \texttt{POVIŠAJ($u$)}. \texttt{POVIŠAJ($u$)} za\-gotovi, da za vsako residualno povezavo $(u,v) \in E_f$ po opravljeni operaciji velja $h(u) \leq h(v) +1$. Vzemimo sedaj residualno povezavo, ki vstopa v $u$, recimo $(w,u) \in E_f$. Po lemi \ref{lem:visina_ne_pada} iz $h(w) \leq h(u) + 1$ pred operacijo sledi $h(w) < h(u) + 1$ po operaciji. Torej operacija \texttt{POVIŠAJ($u$)} očitno ohranja $h$ kot višinsko funkcijo.
 
 Ostane nam pokazati še, da če je $h$ višinska funkcija pred operacijo \texttt{POTISNI($u$,$v$)}, potem je tudi po operaciji. Med to operacijo se zgodi največ ena izmed naslednjih stvari:
 
@@ -767,7 +767,7 @@ Naj bo $G=(V,E,s,t)$ pretočno omrežje, $f$ predpretok v $G$ in $h$ višinska f
 Pokažimo s pomočjo protislovja. Recimo torej, da v $G_f$ obstaja pot $p$ od $s$ do $t$, kjer je $p = \langle v_0 = s, v_1, v_2, \dotsc v_{k-1}, v_k = t\rangle$. Brez škode za splošnost lahko predpostavimo, da je $p$ enostavna pot, torej pot brez ciklov. Potem velja $k < |V|$. Ker je $p$ pot v residualnem omrežju $G_f$, za vsak $i = 0, 1, \dotsc, k-1$ velja, da je $(v_i, v_{i+1}) \in E_f$. Ker pa je $h$ višinska funkcija, za vsak $i = 0, 1, \dotsc, k-1$ velja $h(v_i) \leq h(v_{i+1}) + 1$. Od tod sledi, da velja $h(s) \leq h(t) + k$. Ampak, ker je po definiciji višinske funkcije $h(t) = 0$, dobimo $h(s) \leq k < |V|$, kar pa je v protislovju s tem, da je $h$ višinska funkcija. Veljati bi namreč moralo $h(s) = |V|$. Zaključimo, da v residualnem omrežju $G_f$ torej ne obstaja pot med $s$ in $t$.
 \end{dokaz}
 
-Manjka nam še klasični izrek iskanja maksimalnih pretokov, ki mu v angleščini pravimo \textit{max-flow min-cut theorem}. Nismo se sicer spoznali s pojmom \textit{prerez omrežja}, vendar bomo izrek vseeno navedli v celoti, saj se to edino spodobi. Dokaz izreka bomo izpustili, saj je del predmeta \textit{Optimizacija} in zahteva
+Manjka nam še klasični izrek iskanja maksimalnih pretokov, ki mu v angleščini pra\-vimo \textit{max-flow min-cut theorem}. Nismo se sicer spoznali s pojmom \textit{prerez omrežja}, vendar bomo izrek vseeno navedli v celoti, saj se to edino spodobi. Dokaz izreka bomo izpustili, saj je del predmeta \textit{Optimizacija} in zahteva
 določena znanja, ki za algoritme tipa potisni-povišaj nimajo vrednosti, zaradi česar jih tudi nismo omenjali.
 
 \begin{izrek}[izrek max-pretok min-prerez] \label{izr:maxflowmincut}
@@ -779,7 +779,7 @@ določena znanja, ki za algoritme tipa potisni-povišaj nimajo vrednosti, zaradi
   \end{enumerate}
 \end{izrek}
 
-Sedaj smo pridobili vso potrebno znanje, da dokažemo, da ČE se algoritem \texttt{POTISNI-POVIŠAJ} zaključi, je potem predpretok, ki ga algoritem vrne, enak maksimalnemu pretoku skozi omrežje.
+Sedaj smo pridobili vso potrebno znanje, da dokažemo, da ČE se algoritem \texttt{POTISNI-POVIŠAJ} zaključi, je potem predpretok, ki ga algoritem vrne, enak ma\-ksimalnemu pretoku skozi omrežje.
 
 \begin{izrek}
 Če poženemo algoritem \texttt{POTISNI-POVIŠAJ} na danem pretočnem omrežju $(G=(V,E),c,s,t)$ in se algoritem ustavi, potem je predpretok $f$, ki ga algoritem vrne, enak maksimalnemu toku skozi dano pretočno omrežje.
@@ -882,7 +882,7 @@ Tako lahko iz zgornjih ugotovitev glede povečanja potenciala $\Phi$, posledice 
 Sedaj pa lahko zgornje ugotovitve združimo v zaključni izrek.
 
 \begin{izrek}[časovna zahtevnost]
-Algoritem \texttt{POTISNI-POVIŠAJ} med izvajanjem naredi $\mathcal{O}(V^2E)$ osnovnih operacij.
+Algoritem \texttt{POTISNI-POVIŠAJ} med izvajanjem na\-redi $\mathcal{O}(V^2E)$ osnovnih operacij.
 \end{izrek}
 
 \begin{dokaz}
@@ -941,12 +941,12 @@ ponorom, si oglejmo naslednjo lemo.
 To pomeni, da v našem primeru dodamo vozlišči $s$ in $t$, ki bosta služili kot skupen izvir in ponor. Očitno sedaj velja, da bomo zadovoljili povpraševanje v vseh naseljih natanko tedaj, ko bo
 maksimalen pretok skozi dobljeno pretočno omrežje enak povpraševanju vseh naselij, torej \[ |f| = \sum_{t_i} c(t_i, t). \]
 
-Za lažjo predstavo recimo sedaj, da imamo dve podjetji, $s_1$ in $s_2$, ter štiri naselja, $t_1, t_2, t_3$ in $t_4$, s takim cestnim omrežjem in funkcijo prepustnosti, kakor kaže
+Za lažjo predstavo recimo sedaj, da imamo dve podjetji, $s_1$ in $s_2$, ter štiri nase\-lja, $t_1, t_2, t_3$ in $t_4$, s takim cestnim omrežjem in funkcijo prepustnosti, kakor kaže
 naslednja slika.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/primer1-1/primer1-1-1.jpg}
+  \includegraphics[scale=.358]{images/primer1-1/primer1-1-1.jpg}
   \caption{Pretočno omrežje, ki ga bomo uporabili kot zgled uporabe algoritma potisni-povišaj za problem ponudbe in povpraševanja.}
 \end{figure}
 
@@ -955,7 +955,7 @@ da ga iz obravnave lahko v splošnem kar izključimo. Recimo tako, da bi imeli n
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/primer1-2/primer1-2-1.jpg}
+  \includegraphics[scale=.358]{images/primer1-2/primer1-2-1.jpg}
   \caption{Pretočno omrežje, katerega bi se dalo poenostaviti.}
 \end{figure}
 
@@ -968,7 +968,7 @@ zadovoljimo potrebam vseh naselij $t_1, t_2, t_3$ in $t_4$.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.4]{images/primer1-3/primer1-3-1.jpg}
+  \includegraphics[scale=.358]{images/primer1-3/primer1-3-1.jpg}
   \caption{Primer maksimalnega pretoka v danem pretočnem omrežju. Povezave, obarvane rdeče, so zasičene.}
 \end{figure}
 
@@ -1013,7 +1013,7 @@ To izgleda izjemno grdo in nepregledno, zato si poglejmo še shemo ravnokar defi
 
 \begin{figure}
   \centering
-  \includegraphics[scale=.4]{images/baseball1/baseball1-1.jpg}
+  \includegraphics[scale=.32]{images/baseball1/baseball1-1.jpg}
   \caption{Omrežje, ki modelira problem eliminacije ekip v baseballu.}
   \label{fig:baseball}
 \end{figure}
