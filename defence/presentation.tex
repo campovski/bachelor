@@ -5,8 +5,10 @@
 \usepackage{lmodern}
 
 \usetheme{CambridgeUS}
+\setbeamertemplate{navigation symbols}{}
 
 \newtheorem{thm}{Izrek}
+\newtheorem{definicija}{Definicija}
 
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -26,6 +28,51 @@
 
 \begin{frame}{Pregled vsebine}
 \tableofcontents
+\end{frame}
+
+
+\section{Uvod}
+
+\subsection{Osnovne definicije}
+\begin{frame}{Graf in omrežje}
+    \begin{definicija}
+    \textbf{Graf} $G$ je par množic $G = (V,E)$, kjer je $V$ množica vozlišč grafa, $E \subseteq V \times V$ pa je množica usmerjenih povezav grafa $G$.
+    \end{definicija}
+
+    \begin{definicija}
+    Naj bo $G = (V, E)$ graf. \textbf{Omrežje} na grafu $G$ je par $(G, c)$, kjer je $c \colon V \times V \rightarrow \mathbb{R}^+_0 \cup \{\infty\}$ \textbf{funkcija prepustnosti}, ki vsakemu paru vozlišč $(u,v)$ priredi prepustnost $c(u,v)$ povezave od $u$ do $v$. Prepustnost $c(u,v) = \infty$ natanko tedaj, ko prepustnost povezave ni omejena.
+
+    Velja še, da $c(u,v)=0$ natanko tedaj, ko povezava ne obstaja v $G$.
+
+    \textbf{Pretočno omrežje} na omrežju $(G,c)$ je četverica $(G,c,s,t)$, kjer je $s\in V$ začetno vozlišče pretočnega omrežja, rečemo mu \textbf{izvir}, $t\in V$ pa končno vozlišče pretočnega omrežja, ki mu pravimo \textbf{ponor}.
+    \end{definicija}
+\end{frame}
+
+\begin{frame}{(Maksimalni) pretok}
+    \begin{definicija}
+    \textbf{Pretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{s,t\}$ velja, da je neto tok, ki priteče v vozlišče $v$, enak nič, torej da velja $e_f(v) = 0$.
+    \end{definicija}
+
+    \begin{definicija}
+    \textbf{Maksimalni pretok} je pretok $f$, za katerega velja \[|f| = \max_{f_i} |f_i|,\] kjer $f_i$ teče po vseh možnih pretokih skozi omrežje.
+    \end{definicija}
+
+\end{frame}
+
+\subsection{Pregled algoritmov}
+\begin{frame}{Pregled algoritmov}
+    \centering
+    \begin{tabular}{|l||l|l|}\hline
+        \textit{algoritem} & \textit{časovna zahtevnost} & \textit{leto}\\\hline\hline
+        linearno programiranje & &\\\hline
+        Ford-Fulkerson & $\mathcal{O}(E \max|f|)$ & 1956 \\\hline
+        Edmonds-Karp & $\mathcal{O}(V^2E)$ & 1972 \\\hline
+        Dinic & $\mathcal{O}(VE \log V)$ & 1970 \\\hline
+        potisni-povišaj (gen.) & $\mathcal{O}(V^2E)$ & 1986 \\\hline
+        potisni-povišaj & $\mathcal{O}(V^3)$ & 1988 \\\hline
+        KRT & $\mathcal{O}(VE \log_{\frac{E}{V \log V}} V)$ & 1994 \\\hline
+        Orlin + KRT & $\mathcal{O}(VE)$ & 2013 \\\hline
+    \end{tabular}
 \end{frame}
 
 \section{Algoritem potisni-povišaj}
@@ -77,6 +124,21 @@ INICIALIZIRAJ_PREDPRETOK(G,s)
 12       e(v) = f(s,v)
 \end{verbatim}
 \end{frame}
+
+
+\section{Časovna zahtevnost}
+\begin{frame}{Časovna zahtevnost}
+    Število operacij
+    \begin{itemize}
+        \item \texttt{POTISNI} je kvečjemu $2|V||E| + 4|V|^2 (|V| + |E|)$;
+        \item \texttt{POVIŠAJ} je kvečjemu $2|V|^2$.
+    \end{itemize}
+    \pause
+    \begin{thm}
+        Časovna zahtevnost algoritma \texttt{POTISNI-POVIŠAJ} je $\mathcal{O}(V^2E)$.
+    \end{thm}
+\end{frame}
+
 
 \section{Zgled}
 \begin{frame}{Začetno omrežje}
@@ -294,19 +356,25 @@ INICIALIZIRAJ_PREDPRETOK(G,s)
     \end{columns}
 \end{frame}
 
-\section{Časovna zahtevnost}
-\begin{frame}{Časovna zahtevnost}
-    Število operacij
-    \begin{itemize}
-        \item \texttt{POTISNI} je kvečjemu $2|V||E| + 4|V|^2 (|V| + |E|)$;
-        \item \texttt{POVIŠAJ} je kvečjemu $2|V|^2$.
-    \end{itemize}
-    \pause
-    \begin{thm}
-        Časovna zahtevnost algoritma \texttt{POTISNI-POVIŠAJ} je $\mathcal{O}(V^2E)$.
-    \end{thm}
+\section{Uporaba}
+\begin{frame}{Problem ponudbe in povpraševanja}
+    \centering
+    \includegraphics[scale=0.7]{../writing/images/primer1-1.pdf}~~~\pause
+    \includegraphics[scale=0.7]{../writing/images/primer1-3.pdf}
 \end{frame}
 
+
+\begin{frame}{Baseball elimination}
+    \centering
+    \includegraphics[scale=0.3]{../writing/images/baseball1.pdf}
+\end{frame}
+
+
+\bgroup
+\setbeamercolor{background canvas}{bg=black}
+\begin{frame}[plain]{}
+\end{frame}
+\egroup
 
 
 
