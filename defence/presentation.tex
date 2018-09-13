@@ -18,7 +18,7 @@
 \subtitle{Zagovor dela diplomskega seminarja}
 \author{Marcel Čampa}
 \date{13. september 2018}
-\institute[FMF UL]{Fakulteta za matematiko Univerze v Ljubljani}
+\institute[FMF UL]{Fakulteta za matematiko in fiziko Univerze v Ljubljani}
 
 \begin{document}
 
@@ -50,7 +50,12 @@
 
 \begin{frame}{(Maksimalni) pretok}
     \begin{definicija}
-    \textbf{Pretok} $f$ je tak psevdopretok, v katerem za vsak $v \in V \setminus\{s,t\}$ velja, da je neto tok, ki priteče v vozlišče $v$, enak nič, torej da velja $e_f(v) = 0$.
+    \textbf{Pretok} $f$ je taka funkcija $f\colon V \times V \rightarrow \mathbb{R}$, da velja naslednje.
+    \begin{enumerate}
+        \item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) = - f(v,u)$.
+        \item Za vsaki vozlišči $u,v \in V$ velja $f(u,v) \leq c(u,v)$, kjer je $c$ funkcija prepustnosti.
+        \item Za vsak $v \in V \setminus\{s,t\}$ velja, da je neto tok, ki priteče v vozlišče $v$, enak nič, torej da velja $e_f(v) = 0$.
+    \end{enumerate}
     \end{definicija}
 
     \begin{definicija}
@@ -64,9 +69,8 @@
     \centering
     \begin{tabular}{|l||l|l|}\hline
         \textit{algoritem} & \textit{časovna zahtevnost} & \textit{leto}\\\hline\hline
-        linearno programiranje & &\\\hline
-        Ford-Fulkerson & $\mathcal{O}(E \max|f|)$ & 1956 \\\hline
-        Edmonds-Karp & $\mathcal{O}(V^2E)$ & 1972 \\\hline
+        Ford-Fulkerson & $\mathcal{O}(E |f|)$ & 1956 \\\hline
+        Edmonds-Karp & $\mathcal{O}(VE^2)$ & 1972 \\\hline
         Dinic & $\mathcal{O}(VE \log V)$ & 1970 \\\hline
         potisni-povišaj (gen.) & $\mathcal{O}(V^2E)$ & 1986 \\\hline
         potisni-povišaj & $\mathcal{O}(V^3)$ & 1988 \\\hline
