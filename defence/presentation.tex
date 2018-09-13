@@ -48,6 +48,11 @@
     \end{definicija}
 \end{frame}
 
+\begin{frame}
+    \centering
+    \includegraphics{../writing/images/primer1-1.pdf}
+\end{frame}
+
 \begin{frame}{(Maksimalni) pretok}
     \begin{definicija}
     \textbf{Pretok} $f$ je taka funkcija $f\colon V \times V \rightarrow \mathbb{R}$, da velja naslednje.
@@ -61,7 +66,12 @@
     \begin{definicija}
     \textbf{Maksimalni pretok} je pretok $f$, za katerega velja \[|f| = \max_{f_i} |f_i|,\] kjer $f_i$ teče po vseh možnih pretokih skozi omrežje.
     \end{definicija}
+\end{frame}
 
+\begin{frame}
+    \centering
+    \includegraphics[scale=0.7]{../writing/images/primer1-1.pdf}~~~
+    \includegraphics[scale=0.7]{../writing/images/primer1-3.pdf}
 \end{frame}
 
 \subsection{Pregled algoritmov}
@@ -134,8 +144,8 @@ INICIALIZIRAJ_PREDPRETOK(G,s)
 \begin{frame}{Časovna zahtevnost}
     Število operacij
     \begin{itemize}
-        \item \texttt{POTISNI} je kvečjemu $2|V||E| + 4|V|^2 (|V| + |E|)$;
-        \item \texttt{POVIŠAJ} je kvečjemu $2|V|^2$.
+        \item \texttt{POVIŠAJ} je kvečjemu $2|V|^2$;
+        \item \texttt{POTISNI} je kvečjemu $2|V||E| + 4|V|^2 (|V| + |E|)$.
     \end{itemize}
     \pause
     \begin{thm}
