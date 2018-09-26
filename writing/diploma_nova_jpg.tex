@@ -85,7 +85,7 @@ V tem razdelku se bomo najprej spoznali z osnovnimi definicijami teorije grafov,
 \end{definicija}
 
 \begin{definicija}\label{def:omrezjeprepustnost}
-Naj bo $G = (V, E)$ graf. \textbf{Omrežje} na grafu $G$ je par $(G, c)$, kjer je $c \colon V \times V \rightarrow \mathbb{R}^+_0 \cup \{\infty\}$ \textbf{funkcija prepustnosti}, ki vsakemu paru vozlišč $(u,v)$ priredi prepustnost $c(u,v)$ povezave od $u$ do $v$. Prepustnost $c(u,v) = \infty$ natanko tedaj, ko prepustnost povezave ni omejena.
+Naj bo $G = (V, E)$ graf. \textbf{Omrežje} na grafu $G$ je par $(G, c)$, kjer je $c \colon V \times V \rightarrow \mathbb{R}^+_0 \cup \{\infty\}$ \textbf{funkcija prepustnosti}, ki vsakemu paru vozlišč $(u,v)$ priredi prepustnost $c(u,v)$ povezave od $u$ do $v$. Prepustnost $c(u,v)$ je enaka $\infty$ natanko tedaj, ko prepustnost povezave ni omejena.
 
 Velja še, da $c(u,v)=0$ natanko tedaj, ko povezava ne obstaja v $G$.
 \end{definicija}
@@ -167,7 +167,7 @@ Naj bo $G=(V,E,s,t)$ pretočno omrežje. \textbf{Višinska funkcija} je funkcija
 \end{definicija}
 
 \begin{opomba}
-Privzeli bomo, da če v grafu obstaja povezava $(u,v)$, potem ne obstaja povezava $(v,u)$. Privzemili bomo tudi, da v omrežju nimamo povezav v izvir $s$ in nimamo povezav iz ponora $t$.
+Privzeli bomo, da če v grafu obstaja povezava $(u,v)$, potem ne obstaja povezava $(v,u)$. Privzeli bomo tudi, da v omrežju nimamo povezav v izvir $s$ in nimamo povezav iz ponora $t$.
 \end{opomba}
 
 
@@ -232,7 +232,7 @@ INICIALIZIRAJ_PREDPRETOK(G,s)
 12       e(v) = f(s,v)
 \end{verbatim}~
 
-Kot smo dejali, zgornja operacija nastavi višine vozlišč, tok po povezavah in presežek toka v vozliščih na nič. To storimo v vrsticah 3--7. V vrstici 8 nato nastavimo višino vozlišča $s$ na število vseh vozlišč v omrežju, torej $h(s) = |V|$. V vrsticah 10 in 11 nato potisnemo tok prek vseh povezav, ki izhajajo iz $s$, in posodobimo tok po obratnih povezazah. V vrstici 12 nato popravimo še presežek toka v vozliščih, ki so sosednja $s$. Opazimo, da nismo odšteli presežka toka v vozlišču na začetku povezave, torej v vozlišču $s$. Tega nismo storili, ker je to nepotrebno; predstavljamo si namreč, da je v vozlišču $s$ lahko poljubna količina vode, več kot je potrebujemo, več je lahko dobimo. Kasneje bomo videli, kaj se zgodi, če smo v inicializaciji predpretoka poslali preveč vode, kot je omrežje lahko spusti skozi.
+Kot smo dejali, zgornja operacija nastavi višine vozlišč, tok po povezavah in presežek toka v vozliščih na nič. To storimo v vrsticah 3--7. V vrstici 8 nato nastavimo višino vozlišča $s$ na število vseh vozlišč v omrežju, torej $h(s) = |V|$. V vrsticah 10 in 11 nato potisnemo tok prek vseh povezav, ki izhajajo iz $s$, in posodobimo tok po obratnih povezavah. V vrstici 12 nato popravimo še presežek toka v vozliščih, ki so sosednja $s$. Opazimo, da nismo odšteli presežka toka v vozlišču na začetku povezave, torej v vozlišču $s$. Tega nismo storili, ker je to nepotrebno; predstavljamo si namreč, da je v vozlišču $s$ lahko poljubna količina vode, več kot je potrebujemo, več je lahko dobimo. Kasneje bomo videli, kaj se zgodi, če smo v inicializaciji predpretoka poslali preveč vode, kot je omrežje lahko spusti skozi.
 
 Čas je, da navedemo še glavni del algoritma, torej ,,program'', ki uporablja zgoraj navedene operacije. Psevdokoda je na videz precej preprosta.\\
 
@@ -247,7 +247,7 @@ Na videz nedolžna, vendar skriva rahlo prepreko do povsem direktne im\-ple\-men
 
 \subsection{Primer delovanja algoritma}
 
-Vzemimo preprosto omrežje na petih vozliščih. Pet vozlišč sem izbral zato, ker je to najmanjše število vozlišč, pri katerem se lahko dogajajo zanimive reči. Naj velja $G = (V, E, s, t)$, kjer je
+Vzemimo preprosto omrežje na petih vozliščih. Pet vozlišč smo izbrali zato, ker je to najmanjše število vozlišč, pri katerem se lahko dogajajo zanimive reči. Naj velja $G = (V, E, s, t)$, kjer je
 \begin{align*}
 	V &= \{0,1,2,3,4\},\\
 	E &= \{(0,1), (0,2), (2,1), (1,3), (1,4), (3,4)\},\\
@@ -808,7 +808,7 @@ S tem smo pokazali, da če se algoritem konča, dobimo pravilen rezultat. Ostane
 
 V tem podrazdelku bomo kot obljubljeno dokazali še, da se algoritem \texttt{POTISNI-POVIŠAJ} konča. To bomo naredili s pomočjo omejevanja števila operacij, ki se lahko zgodijo. Namesto osnovnih dveh operacij, \texttt{POTISNI} in \texttt{POVIŠAJ}, se bomo tukaj ukvarjali s tremi operacijami -- operacijo \texttt{POTISNI} bomo namreč razdelili na dve, na tisto, ki povezavo zasiči, in tisto, ki je ne. V pomoč nam bo knjiga \cite{clrs}.\\
 
-Preden se lotimo analize časovne zahtevnosti pa si poglejmo in dokažimo še eno lemo. Spomnimo se, da namreč dovolimo povezave v izvir $s$ v residualnem omrežju.\\
+Preden se lotimo analize časovne zahtevnosti, si poglejmo in dokažimo še eno lemo. Spomnimo se, da namreč dovolimo povezave v izvir $s$ v residualnem omrežju.\\
 
 \begin{lema}\label{lem:enostavna_pot_s}
 Naj bo $(G=(V,E),c,s,t)$ pretočno omrežje in $f$ predpretok v danem pretočnem omrežju. Potem za vsako vozlišče $x\in V$, ki je v presežku, obstaja enostavna pot od $x$ do $s$ v residualnem omrežju.
@@ -1081,19 +1081,19 @@ ima naša ekipa $n$ še možnosti za zmago, če je vrednost maksimalnega pretoka
 \begin{thebibliography}{99}
 
 \bibitem{clrs}
-T.H.~Cormen, C.E.~Leiserson, R.L.~Rivest in C.~Stein, \emph{Introduction to Algorithms}, 3rd ed., MIT Press, Massachusetts, 2009.
-
-\bibitem{uvtg}
-R.J.~Wilson in J.J.~Watkins, \emph{Uvod v teorijo grafov}, Knjižnica Sigma \textbf{63}, DMFA -- založništvo, Ljubljana, 1997.
-
-\bibitem{cpp}
-S.~Meyers, \emph{Effective Modern C++}, O'Reilly Media, Kalifornija, 2014.
+T.H.~Cormen, C.E.~Leiserson, R.L.~Rivest in C.~Stein, \emph{Introduction to algorithms}, 3rd ed., MIT Press, Massachusetts, 2009.
 
 \bibitem{ad}
 J.~Kleinberg in E.~Tardos, \emph{Algorithm design}, Pearson Education Limited, London, 2013.
 
+\bibitem{cpp}
+S.~Meyers, \emph{Effective modern C++}, O'Reilly Media, Kalifornija, 2014.
+
 \bibitem{aicpp}
 R.~Sedgewick, \emph{Algorithms in C++}, 3rd ed., Addison-Wesley Professional, Boston, 1998.
+
+\bibitem{uvtg}
+R.J.~Wilson in J.J.~Watkins, \emph{Uvod v teorijo grafov}, Knjižnica Sigma \textbf{63}, DMFA -- založništvo, Ljubljana, 1997.
 
 \bibitem{wiki}
 \emph{Maximum flow problem}, v: Wikipedia, The Free Encyclopedia, [ogled 14.~3.~2018], dostopno na \url{https://en.wikipedia.org/wiki/Maximum_flow_problem}.
